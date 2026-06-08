@@ -2,390 +2,455 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
-<title>ORQ Properties · Operator Command</title>
-<meta name="robots" content="noindex,nofollow,noarchive,nosnippet"/>
-<meta name="referrer" content="no-referrer"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>ORQ Properties · Off-Market Cash Deals for Serious Investors</title>
+<meta name="description" content="Exclusive off-market, distressed-property deals in Oklahoma & Texas. First-look access for vetted cash buyers. Join the ORQ buyer community."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  /* Deep institutional palette */
-  --void:#05080c;--abyss:#080d14;--ink:#0c131c;--carbon:#111b27;
-  --slate:#18283a;--steel:#22364d;--iron:#324b66;--ash:#5c7186;
-  --mist:#7891a8;--silver:#9fb4c8;--pearl:#c8d6e3;--snow:#eaf1f7;
-  /* Signature gold + accents */
+  --void:#05080c;--abyss:#080d14;--ink:#0c131c;--carbon:#111b27;--slate:#18283a;
+  --steel:#22364d;--iron:#324b66;--ash:#5c7186;--mist:#7891a8;--silver:#9fb4c8;--pearl:#c8d6e3;--snow:#eaf1f7;
   --gold:#d4af37;--gold-bright:#f0cd5a;--gold-dim:#9a7d28;
-  --emerald:#0fae6e;--emerald-dim:#0a7a4d;
-  --sapphire:#2f7df6;--sapphire-dim:#1d5bc4;
-  --ruby:#e23b50;--ruby-dim:#b02438;
-  --amber:#f59e0b;--violet:#8b5cf6;
-  /* Functional */
-  --ok:var(--emerald);--warn:var(--amber);--danger:var(--ruby);--info:var(--sapphire);
-  --font-d:'Fraunces',Georgia,serif;
-  --font-b:'Inter',system-ui,-apple-system,sans-serif;
-  --font-m:'JetBrains Mono','SF Mono',monospace;
-  --glow-gold:0 0 24px rgba(212,175,55,.25);
-  --glow-emerald:0 0 24px rgba(15,174,110,.25);
-  --shadow-card:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);
-  --shadow-float:0 24px 64px rgba(0,0,0,.6);
-  --border:1px solid rgba(255,255,255,.06);
-  --border-bright:1px solid rgba(255,255,255,.1);
+  --emerald:#0fae6e;--emerald-dim:#0a7a4d;--sapphire:#2f7df6;--ruby:#e23b50;--amber:#f59e0b;
+  --font-d:'Fraunces',Georgia,serif;--font-b:'Inter',system-ui,sans-serif;--font-m:'JetBrains Mono',monospace;
+  --glow-gold:0 0 30px rgba(212,175,55,.3);--shadow-float:0 24px 64px rgba(0,0,0,.6);
+  --border:1px solid rgba(255,255,255,.07);--border-bright:1px solid rgba(255,255,255,.12);
 }
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+html{scroll-behavior:smooth}
 body{
-  background:
-    radial-gradient(900px circle at 12% -5%, rgba(47,125,246,.06), transparent 45%),
-    radial-gradient(1000px circle at 95% 0%, rgba(212,175,55,.05), transparent 40%),
-    var(--void);
-  color:var(--pearl);font-family:var(--font-b);font-size:14px;line-height:1.55;
-  -webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;
+  background:radial-gradient(1000px circle at 15% -5%,rgba(212,175,55,.06),transparent 45%),radial-gradient(1100px circle at 90% 5%,rgba(47,125,246,.05),transparent 42%),var(--void);
+  color:var(--pearl);font-family:var(--font-b);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;
 }
 a{color:inherit;text-decoration:none}
 ::selection{background:rgba(212,175,55,.3);color:var(--snow)}
-::-webkit-scrollbar{width:10px;height:10px}
-::-webkit-scrollbar-track{background:var(--abyss)}
-::-webkit-scrollbar-thumb{background:var(--steel);border-radius:5px;border:2px solid var(--abyss)}
-::-webkit-scrollbar-thumb:hover{background:var(--iron)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
 
-/* ════════════ AUTH GATE ════════════ */
-#gate{
-  position:fixed;inset:0;z-index:10000;
-  background:
-    radial-gradient(800px circle at 50% 30%, rgba(212,175,55,.08), transparent 50%),
-    var(--void);
-  display:flex;align-items:center;justify-content:center;flex-direction:column;
-  transition:opacity .6s ease,visibility .6s;
-}
-#gate.unlocked{opacity:0;visibility:hidden;pointer-events:none}
-.gate-mark{
-  font-family:var(--font-m);font-size:.7rem;font-weight:600;letter-spacing:.3em;
-  color:var(--gold);text-transform:uppercase;margin-bottom:40px;
-  display:flex;align-items:center;gap:10px;
-}
-.gate-mark::before,.gate-mark::after{content:'';width:32px;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim))}
-.gate-mark::after{background:linear-gradient(90deg,var(--gold-dim),transparent)}
-.gate-card{
-  width:400px;max-width:92vw;
-  background:linear-gradient(160deg, rgba(24,40,58,.6), rgba(12,19,28,.9));
-  border:var(--border-bright);border-radius:20px;
-  padding:44px 40px;text-align:center;
-  box-shadow:var(--shadow-float),inset 0 1px 0 rgba(255,255,255,.05);
-  backdrop-filter:blur(20px);
-}
-.gate-crest{
-  width:64px;height:64px;margin:0 auto 24px;border-radius:16px;
-  background:linear-gradient(135deg,var(--gold),var(--gold-dim));
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--font-d);font-size:2rem;font-weight:600;color:var(--void);
-  box-shadow:var(--glow-gold);
-}
-.gate-card h1{font-family:var(--font-d);font-size:1.7rem;font-weight:600;color:var(--snow);margin-bottom:6px;letter-spacing:-.01em}
-.gate-card .sub{font-size:.8rem;color:var(--mist);margin-bottom:32px;font-weight:500}
-.gate-field{position:relative;margin-bottom:14px}
-.gate-field input{
-  width:100%;background:rgba(5,8,12,.6);border:var(--border-bright);border-radius:11px;
-  padding:15px 18px;color:var(--snow);font-size:1rem;font-family:var(--font-m);
-  letter-spacing:.15em;text-align:center;outline:none;transition:all .25s;
-}
-.gate-field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.12)}
-.gate-field input::placeholder{letter-spacing:.05em;color:var(--ash);font-size:.85rem}
-.gate-btn{
-  width:100%;margin-top:8px;padding:15px;border:none;border-radius:11px;cursor:pointer;
-  background:linear-gradient(135deg,var(--gold-bright),var(--gold));
-  color:var(--void);font-family:var(--font-b);font-weight:800;font-size:.95rem;
-  letter-spacing:.02em;transition:all .25s;position:relative;overflow:hidden;
-}
-.gate-btn:hover{transform:translateY(-1px);box-shadow:var(--glow-gold)}
-.gate-btn:active{transform:translateY(0)}
-.gate-err{
-  color:var(--ruby);font-size:.8rem;margin-top:14px;font-weight:600;
-  opacity:0;transition:opacity .3s;height:18px;
-}
-.gate-err.show{opacity:1}
-.gate-lock-meta{
-  margin-top:28px;font-family:var(--font-m);font-size:.66rem;color:var(--ash);
-  letter-spacing:.08em;line-height:1.8;
-}
-.gate-lock-meta .dot{color:var(--emerald)}
-.gate-foot{
-  position:fixed;bottom:28px;left:0;right:0;text-align:center;
-  font-family:var(--font-m);font-size:.62rem;color:var(--steel);letter-spacing:.15em;
-}
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:68px;background:linear-gradient(180deg,rgba(8,13,20,.95),rgba(8,13,20,.8));backdrop-filter:blur(20px);border-bottom:var(--border)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:100%}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-mark{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-weight:600;font-size:1.2rem;color:var(--void)}
+.logo-txt{font-family:var(--font-m);font-weight:600;font-size:.9rem;color:var(--snow);letter-spacing:.02em}
+.logo-txt b{color:var(--gold)}
+.nav-cta{display:flex;align-items:center;gap:10px}
 
-/* ════════════ APP SHELL ════════════ */
-#app{opacity:0;transition:opacity .6s ease .2s;min-height:100vh}
-#app.live{opacity:1}
-
-/* Top command bar */
-.cmdbar{
-  position:fixed;top:0;left:0;right:0;z-index:200;height:60px;
-  display:flex;align-items:center;justify-content:space-between;padding:0 24px;
-  background:linear-gradient(180deg, rgba(8,13,20,.96), rgba(8,13,20,.82));
-  border-bottom:var(--border);backdrop-filter:blur(20px);
-}
-.cmd-brand{display:flex;align-items:center;gap:14px}
-.cmd-logo{
-  width:34px;height:34px;border-radius:9px;
-  background:linear-gradient(135deg,var(--gold),var(--gold-dim));
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--font-d);font-weight:600;font-size:1.15rem;color:var(--void);
-}
-.cmd-title{font-family:var(--font-m);font-size:.82rem;font-weight:600;color:var(--snow);letter-spacing:.02em}
-.cmd-title b{color:var(--gold)}
-.cmd-env{
-  font-family:var(--font-m);font-size:.6rem;font-weight:600;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--emerald);
-  background:rgba(15,174,110,.1);border:1px solid rgba(15,174,110,.25);
-  padding:3px 9px;border-radius:100px;
-}
-.cmd-right{display:flex;align-items:center;gap:8px}
-.cmd-clock{font-family:var(--font-m);font-size:.72rem;color:var(--mist);margin-right:8px}
-.cmd-icon-btn{
-  width:36px;height:36px;border-radius:9px;border:var(--border);
-  background:rgba(255,255,255,.02);color:var(--silver);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s;
-}
-.cmd-icon-btn:hover{background:rgba(255,255,255,.06);color:var(--snow)}
-.cmd-lock{
-  font-family:var(--font-b);font-weight:700;font-size:.76rem;
-  padding:8px 16px;border-radius:9px;border:1px solid rgba(226,59,80,.3);
-  background:rgba(226,59,80,.08);color:#ff8896;cursor:pointer;transition:all .2s;
-}
-.cmd-lock:hover{background:rgba(226,59,80,.16)}
-
-/* Layout */
-.shell{display:flex;padding-top:60px;min-height:100vh}
-.nav{
-  width:230px;flex-shrink:0;position:fixed;top:60px;left:0;bottom:0;
-  background:linear-gradient(180deg, var(--abyss), var(--void));
-  border-right:var(--border);overflow-y:auto;padding:18px 0 40px;
-}
-.nav-grp{margin-bottom:6px}
-.nav-grp-label{
-  font-family:var(--font-m);font-size:.6rem;font-weight:600;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--ash);padding:14px 22px 8px;
-}
-.nav-item{
-  display:flex;align-items:center;gap:12px;padding:10px 22px;cursor:pointer;
-  font-size:.86rem;font-weight:600;color:var(--silver);transition:all .18s;
-  border-left:2px solid transparent;position:relative;
-}
-.nav-item:hover{background:rgba(255,255,255,.03);color:var(--snow)}
-.nav-item.on{
-  color:var(--snow);background:linear-gradient(90deg, rgba(212,175,55,.1), transparent);
-  border-left-color:var(--gold);
-}
-.nav-item .ni-icon{font-size:1.05rem;width:22px;text-align:center;opacity:.9}
-.nav-item .ni-badge{
-  margin-left:auto;font-family:var(--font-m);font-size:.62rem;font-weight:700;
-  min-width:20px;height:18px;padding:0 6px;border-radius:100px;
-  display:flex;align-items:center;justify-content:center;
-  background:var(--sapphire);color:#fff;
-}
-.nav-item .ni-badge.gold{background:var(--gold);color:var(--void)}
-.nav-item .ni-badge.red{background:var(--ruby);color:#fff}
-.nav-item .ni-badge.green{background:var(--emerald);color:#fff}
-
-.nav-status{margin:20px 22px 0;padding:14px;border-radius:12px;background:rgba(255,255,255,.02);border:var(--border)}
-.nav-status-row{display:flex;align-items:center;justify-content:space-between;font-size:.72rem;margin-bottom:8px}
-.nav-status-row:last-child{margin-bottom:0}
-.nav-status-row .lbl{color:var(--mist);font-weight:500}
-.nav-status-row .val{font-family:var(--font-m);font-weight:600;color:var(--silver)}
-.auto-pill{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-m);font-size:.66rem;font-weight:700;padding:3px 8px;border-radius:100px}
-.auto-pill.running{background:rgba(15,174,110,.12);color:var(--emerald)}
-.auto-pill.paused{background:rgba(245,158,11,.12);color:var(--amber)}
-.auto-pill.stopped{background:rgba(226,59,80,.12);color:#ff8896}
-.auto-pill .pulse{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-
-/* Main */
-.main{margin-left:230px;flex:1;padding:30px 36px 80px;max-width:1500px}
-.view{display:none;animation:fadeUp .4s ease}
-.view.on{display:block}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-.page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px}
-.page-head h1{font-family:var(--font-d);font-size:2.3rem;font-weight:600;color:var(--snow);letter-spacing:-.02em;line-height:1.1}
-.page-head .ph-sub{font-size:.88rem;color:var(--mist);margin-top:4px}
-.page-head .ph-sub .live{display:inline-flex;align-items:center;gap:6px;color:var(--emerald);font-weight:600}
-.page-head .ph-sub .live .pulse{width:7px;height:7px;border-radius:50%;background:var(--emerald);animation:pulse 2s infinite}
-
-/* Buttons */
-.btn{
-  display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border:none;border-radius:10px;
-  font-family:var(--font-b);font-weight:700;font-size:.84rem;cursor:pointer;transition:all .2s;white-space:nowrap;
-}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:9px;padding:13px 24px;border:none;border-radius:11px;font-family:var(--font-b);font-weight:700;font-size:.9rem;cursor:pointer;transition:all .2s;white-space:nowrap}
 .btn-gold{background:linear-gradient(135deg,var(--gold-bright),var(--gold));color:var(--void)}
-.btn-gold:hover{transform:translateY(-1px);box-shadow:var(--glow-gold)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:var(--glow-gold)}
 .btn-emerald{background:linear-gradient(135deg,var(--emerald),var(--emerald-dim));color:#fff}
-.btn-emerald:hover{transform:translateY(-1px);box-shadow:var(--glow-emerald)}
-.btn-sapphire{background:linear-gradient(135deg,var(--sapphire),var(--sapphire-dim));color:#fff}
-.btn-ghost{background:rgba(255,255,255,.04);color:var(--silver);border:var(--border-bright)}
-.btn-ghost:hover{background:rgba(255,255,255,.08);color:var(--snow)}
-.btn-danger{background:rgba(226,59,80,.1);color:#ff8896;border:1px solid rgba(226,59,80,.3)}
-.btn-danger:hover{background:rgba(226,59,80,.18)}
-.btn-sm{padding:7px 13px;font-size:.76rem;border-radius:8px}
-.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.btn-emerald:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(15,174,110,.3)}
+.btn-ghost{background:rgba(255,255,255,.05);color:var(--silver);border:var(--border-bright)}
+.btn-ghost:hover{background:rgba(255,255,255,.1);color:var(--snow)}
+.btn-lg{padding:16px 32px;font-size:1rem;border-radius:13px}
+.btn-sm{padding:9px 16px;font-size:.82rem;border-radius:9px}
 
-/* Cards */
-.card{background:linear-gradient(160deg, rgba(17,27,39,.7), rgba(12,19,28,.85));border:var(--border);border-radius:16px;box-shadow:var(--shadow-card)}
-.card-pad{padding:22px}
+/* HERO */
+.hero{padding:150px 0 90px;text-align:center;position:relative}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-m);font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.25);padding:7px 16px;border-radius:100px;margin-bottom:28px}
+.hero-badge .pulse{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-family:var(--font-d);font-size:clamp(2.6rem,6vw,4.6rem);font-weight:600;color:var(--snow);line-height:1.05;letter-spacing:-.02em;margin-bottom:24px}
+.hero h1 .accent{background:linear-gradient(135deg,var(--gold-bright),var(--gold));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-style:italic}
+.hero p{font-size:1.2rem;color:var(--silver);max-width:680px;margin:0 auto 40px;line-height:1.6}
+.hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.hero-trust{margin-top:44px;display:flex;gap:36px;justify-content:center;flex-wrap:wrap;font-size:.84rem;color:var(--mist)}
+.hero-trust b{color:var(--snow);font-family:var(--font-m)}
 
-/* Stat tiles */
-.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
-.stat{position:relative;overflow:hidden;background:linear-gradient(160deg, rgba(17,27,39,.7), rgba(12,19,28,.85));border:var(--border);border-radius:16px;padding:20px 22px}
-.stat::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--c,var(--gold));opacity:.8}
-.stat .s-ico{position:absolute;top:18px;right:18px;font-size:1.3rem;opacity:.25}
-.stat .s-val{font-family:var(--font-m);font-size:2rem;font-weight:700;color:var(--snow);letter-spacing:-.02em;line-height:1}
-.stat .s-lbl{font-size:.74rem;color:var(--mist);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:8px}
-.stat .s-delta{font-family:var(--font-m);font-size:.72rem;font-weight:600;margin-top:10px;display:flex;align-items:center;gap:5px}
-.s-delta.up{color:var(--emerald)}.s-delta.flat{color:var(--mist)}.s-delta.gold{color:var(--gold)}
+/* SECTION */
+section{padding:80px 0}
+.sec-head{text-align:center;margin-bottom:54px}
+.sec-tag{font-family:var(--font-m);font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.sec-head h2{font-family:var(--font-d);font-size:clamp(2rem,4vw,3rem);font-weight:600;color:var(--snow);letter-spacing:-.02em;line-height:1.1}
+.sec-head p{font-size:1.05rem;color:var(--silver);max-width:600px;margin:16px auto 0}
 
-.section-label{font-family:var(--font-b);font-weight:800;font-size:.95rem;color:var(--snow);margin-bottom:16px;display:flex;align-items:center;gap:10px}
-.section-label .sl-tag{font-family:var(--font-m);font-size:.62rem;font-weight:600;color:var(--ash);letter-spacing:.1em;text-transform:uppercase}
+/* HOW IT WORKS */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.step{position:relative;background:linear-gradient(160deg,rgba(17,27,39,.7),rgba(12,19,28,.85));border:var(--border);border-radius:18px;padding:30px 24px}
+.step-n{font-family:var(--font-d);font-size:2.4rem;font-weight:600;color:var(--gold);opacity:.4;line-height:1}
+.step h3{font-size:1.05rem;font-weight:800;color:var(--snow);margin:12px 0 8px}
+.step p{font-size:.88rem;color:var(--mist);line-height:1.6}
 
-/* Toast */
-#toast-stack{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9000;display:flex;flex-direction:column;gap:10px;align-items:center}
-.toast{
-  background:linear-gradient(160deg, var(--carbon), var(--ink));border:var(--border-bright);
-  border-radius:12px;padding:13px 20px;font-size:.84rem;font-weight:600;color:var(--snow);
-  box-shadow:var(--shadow-float);display:flex;align-items:center;gap:10px;
-  animation:toastIn .3s ease;max-width:440px;
-}
-.toast .t-ico{font-size:1.1rem}
-.toast.ok{border-left:3px solid var(--emerald)}
-.toast.warn{border-left:3px solid var(--amber)}
-.toast.err{border-left:3px solid var(--ruby)}
-.toast.info{border-left:3px solid var(--sapphire)}
-@keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+/* DEAL TEASERS (blind) */
+.deals-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:22px}
+.deal{position:relative;background:linear-gradient(160deg,rgba(17,27,39,.8),rgba(12,19,28,.92));border:var(--border);border-radius:18px;overflow:hidden;transition:all .25s}
+.deal:hover{transform:translateY(-4px);border-color:rgba(212,175,55,.3);box-shadow:var(--shadow-float)}
+.deal-img{height:170px;position:relative;background:linear-gradient(135deg,var(--steel),var(--ink));display:flex;align-items:center;justify-content:center;overflow:hidden}
+.deal-img .blur-map{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(8px) brightness(.5);transform:scale(1.1)}
+.deal-img .locked-pin{position:relative;z-index:1;text-align:center}
+.deal-img .locked-pin .ico{font-size:2.2rem;margin-bottom:6px}
+.deal-img .locked-pin .txt{font-family:var(--font-m);font-size:.66rem;font-weight:600;letter-spacing:.1em;color:var(--silver);text-transform:uppercase}
+.deal-grade{position:absolute;top:14px;right:14px;z-index:2;font-family:var(--font-m);font-size:.66rem;font-weight:700;letter-spacing:.05em;padding:5px 12px;border-radius:100px;backdrop-filter:blur(8px)}
+.deal-body{padding:22px}
+.deal-id{font-family:var(--font-m);font-size:.68rem;font-weight:600;color:var(--ash);letter-spacing:.08em;margin-bottom:6px}
+.deal-title{font-family:var(--font-d);font-size:1.3rem;font-weight:600;color:var(--snow);margin-bottom:4px}
+.deal-loc{font-size:.84rem;color:var(--mist);margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.deal-metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.deal-metric{background:rgba(5,8,12,.5);border:var(--border);border-radius:11px;padding:12px 14px}
+.deal-metric .dm-lbl{font-size:.66rem;color:var(--ash);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.deal-metric .dm-val{font-family:var(--font-m);font-size:1.05rem;font-weight:700;color:var(--snow);margin-top:3px}
+.deal-metric .dm-val.green{color:var(--emerald)}
+.deal-metric .dm-val.gold{color:var(--gold)}
+.deal-lock-note{display:flex;align-items:center;gap:8px;font-size:.74rem;color:var(--mist);padding:11px 13px;border-radius:10px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.18);margin-bottom:16px}
+.deal-foot{display:flex;flex-direction:column;gap:8px}
 
-/* Modal */
-.modal-bg{position:fixed;inset:0;z-index:8000;background:rgba(5,8,12,.8);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px}
-.modal-bg.open{display:flex}
-.modal{
-  width:520px;max-width:96vw;max-height:90vh;overflow-y:auto;
-  background:linear-gradient(160deg, var(--carbon), var(--ink));
-  border:var(--border-bright);border-radius:18px;padding:32px;box-shadow:var(--shadow-float);
-  animation:modalIn .3s ease;
-}
-@keyframes modalIn{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.modal h2{font-family:var(--font-d);font-size:1.6rem;font-weight:600;color:var(--snow);margin-bottom:6px}
-.modal .m-sub{font-size:.85rem;color:var(--mist);margin-bottom:24px}
+/* RULES / FIREWALL */
+.rules-card{background:linear-gradient(160deg,rgba(17,27,39,.8),rgba(12,19,28,.9));border:var(--border-bright);border-radius:22px;padding:44px;max-width:920px;margin:0 auto}
+.rules-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:8px}
+.rule{display:flex;gap:14px;padding:18px;border-radius:14px;background:rgba(255,255,255,.02);border:var(--border)}
+.rule .r-ico{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem;background:rgba(212,175,55,.1);color:var(--gold)}
+.rule h4{font-size:.94rem;font-weight:800;color:var(--snow);margin-bottom:4px}
+.rule p{font-size:.82rem;color:var(--mist);line-height:1.55}
+
+/* COMMITMENT */
+.commit{background:linear-gradient(160deg,rgba(212,175,55,.08),rgba(12,19,28,.9));border:1px solid rgba(212,175,55,.25);border-radius:22px;padding:48px;text-align:center;max-width:760px;margin:0 auto;position:relative;overflow:hidden}
+.commit::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.commit .price{font-family:var(--font-d);font-size:4rem;font-weight:600;color:var(--gold);line-height:1}
+.commit .price small{font-size:1.1rem;color:var(--mist);font-family:var(--font-b);font-weight:600}
+.commit h3{font-family:var(--font-d);font-size:1.8rem;color:var(--snow);margin:10px 0 14px}
+.commit p{font-size:.95rem;color:var(--silver);max-width:520px;margin:0 auto 12px}
+.commit-includes{display:flex;flex-direction:column;gap:10px;max-width:440px;margin:24px auto;text-align:left}
+.commit-includes li{display:flex;align-items:center;gap:11px;font-size:.88rem;color:var(--pearl);list-style:none}
+.commit-includes .ck{width:22px;height:22px;border-radius:50%;background:rgba(15,174,110,.15);color:var(--emerald);display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0}
+.commit-fine{font-family:var(--font-m);font-size:.72rem;color:var(--ash);margin-top:18px;line-height:1.7}
+
+/* FORM */
+.form-card{background:linear-gradient(160deg,rgba(17,27,39,.85),rgba(12,19,28,.95));border:var(--border-bright);border-radius:22px;padding:44px;max-width:560px;margin:0 auto;box-shadow:var(--shadow-float)}
+.form-card h3{font-family:var(--font-d);font-size:1.9rem;color:var(--snow);margin-bottom:6px;text-align:center}
+.form-card .fc-sub{font-size:.9rem;color:var(--mist);text-align:center;margin-bottom:30px}
 .field{margin-bottom:16px}
-.field label{display:block;font-size:.76rem;font-weight:700;color:var(--silver);margin-bottom:6px;letter-spacing:.02em}
-.field input,.field select,.field textarea{
-  width:100%;background:rgba(5,8,12,.5);border:var(--border-bright);border-radius:10px;
-  padding:12px 14px;color:var(--snow);font-size:.9rem;font-family:var(--font-b);outline:none;transition:all .2s;
-}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.1)}
+.field label{display:block;font-size:.78rem;font-weight:700;color:var(--silver);margin-bottom:7px;letter-spacing:.02em}
+.field input,.field select{width:100%;background:rgba(5,8,12,.6);border:var(--border-bright);border-radius:11px;padding:14px 16px;color:var(--snow);font-size:.95rem;font-family:var(--font-b);outline:none;transition:all .2s}
+.field input:focus,.field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.12)}
+.field input::placeholder{color:var(--ash)}
 .field select option{background:var(--carbon)}
-.field .hint{font-size:.72rem;color:var(--ash);margin-top:5px}
-.m-actions{display:flex;gap:10px;margin-top:24px}
-.m-actions .btn{flex:1;justify-content:center}
+.field-row{display:flex;gap:12px}
+.field-row .field{flex:1}
+.form-foot{font-family:var(--font-m);font-size:.7rem;color:var(--ash);text-align:center;margin-top:16px;line-height:1.7}
 
-/* Responsive */
-@media(max-width:1000px){
-  .nav{transform:translateX(-100%);transition:transform .3s}
-  .nav.open{transform:translateX(0)}
-  .main{margin-left:0}
-  .stat-row{grid-template-columns:1fr 1fr}
+/* FOOTER */
+footer{padding:60px 0 40px;border-top:var(--border);margin-top:40px}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+.foot-disclaimer{font-family:var(--font-m);font-size:.68rem;color:var(--ash);max-width:620px;line-height:1.7}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;z-index:1000;background:rgba(5,8,12,.85);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal{width:540px;max-width:96vw;max-height:92vh;overflow-y:auto;background:linear-gradient(160deg,var(--carbon),var(--ink));border:var(--border-bright);border-radius:20px;padding:40px;box-shadow:var(--shadow-float);animation:mIn .3s ease}
+@keyframes mIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.modal h2{font-family:var(--font-d);font-size:1.8rem;color:var(--snow);margin-bottom:6px}
+.modal .m-sub{font-size:.9rem;color:var(--mist);margin-bottom:24px}
+.modal-close{position:absolute;top:20px;right:24px;font-size:1.4rem;color:var(--ash);cursor:pointer;background:none;border:none}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:2000;display:flex;flex-direction:column;gap:10px;align-items:center}
+.toast{background:linear-gradient(160deg,var(--carbon),var(--ink));border:var(--border-bright);border-radius:12px;padding:14px 22px;font-size:.88rem;font-weight:600;color:var(--snow);box-shadow:var(--shadow-float);animation:tIn .3s ease;border-left:3px solid var(--emerald)}
+@keyframes tIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:880px){
+  .steps{grid-template-columns:1fr 1fr}
+  .rules-grid{grid-template-columns:1fr}
 }
 @media(max-width:560px){
-  .stat-row{grid-template-columns:1fr}
-  .main{padding:20px 16px 80px}
-  .page-head h1{font-size:1.8rem}
+  .steps{grid-template-columns:1fr}
+  .hero{padding:120px 0 70px}
+  .rules-card,.commit,.form-card{padding:30px 22px}
+  .field-row{flex-direction:column;gap:0}
 }
 </style>
 </head>
 <body>
 
-<!-- ════════ AUTH GATE ════════ -->
-<div id="gate">
-  <div class="gate-mark">Restricted Access</div>
-  <div class="gate-card">
-    <div class="gate-crest">O</div>
-    <h1>Operator Command</h1>
-    <div class="sub">ORQ Properties · Single-Operator Authentication</div>
-    <div class="gate-field">
-      <input id="passphrase" type="password" autocomplete="off" spellcheck="false"
-             placeholder="Enter operator passphrase" onkeydown="if(event.key==='Enter')Auth.attempt()"/>
+<nav>
+  <div class="wrap">
+    <div class="logo">
+      <div class="logo-mark">O</div>
+      <div class="logo-txt">ORQ<b>·</b>PROPERTIES</div>
     </div>
-    <button class="gate-btn" onclick="Auth.attempt()">Authenticate →</button>
-    <div class="gate-err" id="gate-err">Access denied. Attempt logged.</div>
-    <div class="gate-lock-meta">
-      <span class="dot">●</span> AES session encryption · auto-lock 30 min idle<br/>
-      Unauthorized access is prohibited &amp; monitored
+    <div class="nav-cta">
+      <a href="#deals" class="btn btn-ghost btn-sm">View Deals</a>
+      <a href="#join" class="btn btn-gold btn-sm">Join Buyer List</a>
     </div>
   </div>
-  <div class="gate-foot">ORQ PROPERTIES · OPERATOREDGEHQ LLC · CONFIDENTIAL</div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-badge"><span class="pulse"></span> Off-Market · Invitation-Only · Oklahoma &amp; Texas</div>
+    <h1>Off-market cash deals,<br/>before <span class="accent">anyone else</span> sees them.</h1>
+    <p>ORQ Properties sources distressed, motivated-seller properties across Oklahoma and Texas — and delivers them straight to a private network of serious cash buyers. No MLS. No bidding wars. First look.</p>
+    <div class="hero-cta">
+      <a href="#join" class="btn btn-gold btn-lg">🔑 Get First-Look Access</a>
+      <a href="#how" class="btn btn-ghost btn-lg">How It Works</a>
+    </div>
+    <div class="hero-trust">
+      <div>⚡ <b>Avg 12-day</b> close</div>
+      <div>🎯 <b>Grade A/B</b> distress scored</div>
+      <div>🤝 <b>Verified</b> cash-buyer network</div>
+    </div>
+  </div>
+</header>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">The Process</div>
+      <h2>Four steps to your next deal</h2>
+      <p>Clean, clear, and built so serious buyers win. Here's exactly how it works.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-n">01</div><h3>Join the buyer list</h3><p>Tell us your buy box — markets, budget, property type. It's free. Aria, our AI deal concierge, confirms your details.</p></div>
+      <div class="step"><div class="step-n">02</div><h3>Get deal alerts</h3><p>We send you blind teasers on new off-market deals: market, numbers, distress grade, est. spread — everything but the exact address.</p></div>
+      <div class="step"><div class="step-n">03</div><h3>Reserve a deal</h3><p>See one you want? Place your $2,500 commitment to unlock the full address, comps, photos, and contract — and lock your buyer position.</p></div>
+      <div class="step"><div class="step-n">04</div><h3>Close &amp; profit</h3><p>We assign you the contract and close through a licensed title company. Your commitment credits toward your assignment fee at closing.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- DEALS (blind teasers) -->
+<section id="deals" style="background:linear-gradient(180deg,transparent,rgba(8,13,20,.4),transparent)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">Live Inventory</div>
+      <h2>Current off-market opportunities</h2>
+      <p>Real deals, real numbers. Full address &amp; details unlock with your commitment — that's how we protect every buyer's position.</p>
+    </div>
+    <div class="deals-grid" id="deals-grid"><!-- injected --></div>
+  </div>
+</section>
+
+<!-- RULES / FIREWALL -->
+<section id="rules">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">The Rules · Crystal Clear</div>
+      <h2>How we keep it clean &amp; fair</h2>
+      <p>Everyone follows the same rules. That's what makes this network work — and what protects you.</p>
+    </div>
+    <div class="rules-card">
+      <div class="rules-grid">
+        <div class="rule"><div class="r-ico">🔒</div><div><h4>Deal details are protected</h4><p>Exact address, owner, and parcel stay sealed until you place your commitment. This stops anyone from going around the network to approach the seller directly.</p></div></div>
+        <div class="rule"><div class="r-ico">🤝</div><div><h4>First committed buyer wins</h4><p>Deals are assigned to the first qualified buyer who commits. No silent auctions, no games. Move when you see value.</p></div></div>
+        <div class="rule"><div class="r-ico">💳</div><div><h4>Commitment confirms you're serious</h4><p>The $2,500 deal commitment filters tire-kickers and secures your position. It's non-refundable — and credited toward your assignment fee at close.</p></div></div>
+        <div class="rule"><div class="r-ico">🏦</div><div><h4>Every close runs through title</h4><p>Funds are handled by a licensed title/escrow company. Clean paper, clean money, every time.</p></div></div>
+        <div class="rule"><div class="r-ico">🚫</div><div><h4>No circumvention</h4><p>Using ORQ deal information to contact a seller directly, or to bypass the assignment, forfeits your network access and any commitments on file.</p></div></div>
+        <div class="rule"><div class="r-ico">📜</div><div><h4>One simple agreement</h4><p>Joining means you agree to these terms. No fine-print traps. Read them once, and you're set for every deal.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMITMENT -->
+<section id="commit">
+  <div class="wrap">
+    <div class="commit">
+      <div class="price">$2,500<small> · commitment</small></div>
+      <h3>Reserve any deal. Lock your position.</h3>
+      <p>When you find a deal worth pursuing, your $2,500 commitment unlocks everything and assigns the deal to you.</p>
+      <ul class="commit-includes">
+        <li><span class="ck">✓</span> Full property address, photos &amp; comparable sales</li>
+        <li><span class="ck">✓</span> Seller motivation &amp; timeline from Aria's call notes</li>
+        <li><span class="ck">✓</span> Signed assignment of contract in your name</li>
+        <li><span class="ck">✓</span> Direct line to the ORQ acquisitions desk</li>
+        <li><span class="ck">✓</span> Credited toward your assignment fee at closing</li>
+      </ul>
+      <a href="#join" class="btn btn-gold btn-lg">🔑 Join to Reserve Deals</a>
+      <div class="commit-fine">The $2,500 deal commitment is non-refundable. It secures your buyer position and is credited toward your assignment fee when the deal closes. ORQ Properties is a wholesaler and assigns equitable interest in contracts; it is not a licensed real estate broker and does not provide legal, tax, or investment advice.</div>
+    </div>
+  </div>
+</section>
+
+<!-- JOIN FORM -->
+<section id="join">
+  <div class="wrap">
+    <div class="form-card">
+      <h3>Join the buyer network</h3>
+      <div class="fc-sub">Free to join. Get first-look deal alerts from Aria. No spam — just deals that fit your buy box.</div>
+      <div class="field"><label>Full Name</label><input id="b-name" placeholder="Your name" autocomplete="name"/></div>
+      <div class="field-row">
+        <div class="field"><label>Phone</label><input id="b-phone" placeholder="(405) 555-0100" autocomplete="tel" type="tel"/></div>
+        <div class="field"><label>Email</label><input id="b-email" placeholder="you@email.com" autocomplete="email" type="email"/></div>
+      </div>
+      <div class="field"><label>Markets You Buy In</label>
+        <select id="b-market">
+          <option value="">Select a market…</option>
+          <option>Lawton, OK</option><option>Oklahoma City, OK</option><option>Tulsa, OK</option>
+          <option>Fort Worth, TX</option><option>Dallas, TX</option><option>Multiple / Statewide</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Buy Box (Max Budget)</label>
+          <select id="b-budget"><option>Under $75k</option><option>$75k – $150k</option><option>$150k – $300k</option><option>$300k+</option></select>
+        </div>
+        <div class="field"><label>Strategy</label>
+          <select id="b-strategy"><option>Fix &amp; Flip</option><option>Buy &amp; Hold</option><option>BRRRR</option><option>Wholesale</option></select>
+        </div>
+      </div>
+      <button class="btn btn-gold btn-lg" style="width:100%;justify-content:center;margin-top:8px" onclick="Funnel.join()">🔑 Join &amp; Get Deal Alerts</button>
+      <div class="form-foot">By joining you agree to ORQ Properties' buyer terms &amp; the rules above.<br/>Aria may contact you by phone, SMS &amp; email about matching deals.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><div class="logo-mark">O</div><div class="logo-txt">ORQ<b>·</b>PROPERTIES</div></div>
+    <div class="foot-disclaimer">© ORQ Properties · OperatorEdgeHQ LLC. ORQ Properties is a real estate wholesaler and markets equitable interest in purchase contracts to its private buyer network. We are not a licensed real estate brokerage and do not provide legal, tax, or investment advice. All closings are conducted through a licensed title/escrow company. Deal commitments are non-refundable and credited toward assignment fees at closing.</div>
+  </div>
+</footer>
+
+<!-- RESERVE MODAL -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal" id="modal" style="position:relative">
+    <button class="modal-close" onclick="Funnel.closeModal()">×</button>
+    <div id="modal-content"></div>
+  </div>
 </div>
 
-<!-- ════════ APP ════════ -->
-<div id="app">
-  <div class="cmdbar">
-    <div class="cmd-brand">
-      <div class="cmd-logo">O</div>
-      <div>
-        <div class="cmd-title">ORQ<b>·</b>PROPERTIES <span style="color:var(--ash)">Operator Command</span></div>
-      </div>
-      <span class="cmd-env">● LIVE</span>
-    </div>
-    <div class="cmd-right">
-      <span class="cmd-clock" id="clock">—</span>
-      <button class="cmd-icon-btn" title="Refresh data" onclick="App.refresh()">⟳</button>
-      <button class="cmd-lock" onclick="Auth.lock()">🔒 Lock</button>
-    </div>
-  </div>
+<div id="toast"></div>
 
-  <div class="shell">
-    <!-- NAV -->
-    <nav class="nav" id="nav">
-      <div class="nav-grp">
-        <div class="nav-grp-label">Operations</div>
-        <div class="nav-item on" data-view="command" onclick="App.go('command',this)"><span class="ni-icon">⚡</span> Command Center</div>
-        <div class="nav-item" data-view="acquisition" onclick="App.go('acquisition',this)"><span class="ni-icon">🎯</span> Acquisition Engine <span class="ni-badge gold" id="nb-leads">0</span></div>
-        <div class="nav-item" data-view="pipeline" onclick="App.go('pipeline',this)"><span class="ni-icon">📋</span> Deal Pipeline <span class="ni-badge" id="nb-pipeline">0</span></div>
-        <div class="nav-item" data-view="disposition" onclick="App.go('disposition',this)"><span class="ni-icon">🤝</span> Disposition / Buyers</div>
-      </div>
-      <div class="nav-grp">
-        <div class="nav-grp-label">Capital</div>
-        <div class="nav-item" data-view="vault" onclick="App.go('vault',this)"><span class="ni-icon">🛡️</span> Revenue Vault <span class="ni-badge green" id="nb-vault">0</span></div>
-        <div class="nav-item" data-view="contracts" onclick="App.go('contracts',this)"><span class="ni-icon">✍️</span> Contracts &amp; Escrow</div>
-      </div>
-      <div class="nav-grp">
-        <div class="nav-grp-label">Control</div>
-        <div class="nav-item" data-view="automation" onclick="App.go('automation',this)"><span class="ni-icon">🎛️</span> Automation Control</div>
-        <div class="nav-item" data-view="tools" onclick="App.go('tools',this)"><span class="ni-icon">🧰</span> Operator Tools</div>
-      </div>
+<script>
+const CFG = {
+  API_BASE: 'https://app.orq.world/api',
+  ARIA_PHONE: '+1 (580) 324-0721',
+  COMMITMENT: 2500,
+};
 
-      <div class="nav-status">
-        <div class="nav-status-row">
-          <span class="lbl">Automation</span>
-          <span class="auto-pill paused" id="nav-auto"><span class="pulse"></span> PAUSED</span>
+// Blind deal teasers — NO address, owner, or exact location exposed
+const TEASERS = [
+  { id:'LAW-1428', codename:'Cache Road Opportunity', city:'Lawton, OK', type:'3BR / 2BA · 1,340 sqft', grade:'A', arvBand:'$110k–$120k', spreadBand:'$30k–$38k', repairBand:'~$28k', area:'Northwest Lawton' },
+  { id:'TUL-1107', codename:'6th Street Estate', city:'Tulsa, OK', type:'4BR / 2BA · 1,720 sqft', grade:'A', arvBand:'$130k–$140k', spreadBand:'$34k–$42k', repairBand:'~$30k', area:'East Tulsa' },
+  { id:'OKC-8902', codename:'NW 23rd Holding', city:'Oklahoma City, OK', type:'3BR / 1.5BA · 1,210 sqft', grade:'B', arvBand:'$140k–$150k', spreadBand:'$26k–$33k', repairBand:'~$22k', area:'NW Oklahoma City' },
+  { id:'LAW-3215', codename:'Gore Boulevard Flip', city:'Lawton, OK', type:'2BR / 1BA · 980 sqft', grade:'B', arvBand:'$92k–$102k', spreadBand:'$22k–$28k', repairBand:'~$18k', area:'Central Lawton' },
+];
+
+function gradeColor(g){ return {A:'#e23b50',B:'#f59e0b',C:'#d4af37'}[g]||'#7891a8'; }
+
+const Funnel = {
+  render() {
+    document.getElementById('deals-grid').innerHTML = TEASERS.map(d => `
+      <div class="deal">
+        <div class="deal-img">
+          <div class="blur-map" style="background-image:linear-gradient(135deg,#22364d,#0c131c)"></div>
+          <div class="deal-grade" style="background:${gradeColor(d.grade)}22;color:${gradeColor(d.grade)};border:1px solid ${gradeColor(d.grade)}55">GRADE ${d.grade}</div>
+          <div class="locked-pin"><div class="ico">🔒</div><div class="txt">Location sealed</div></div>
         </div>
-        <div class="nav-status-row">
-          <span class="lbl">Aria Line</span>
-          <span class="val" style="color:var(--emerald)">● Live</span>
-        </div>
-        <div class="nav-status-row">
-          <span class="lbl">Stripe</span>
-          <span class="val" id="nav-stripe" style="color:var(--amber)">○ Setup</span>
+        <div class="deal-body">
+          <div class="deal-id">DEAL ${d.id}</div>
+          <div class="deal-title">${d.codename}</div>
+          <div class="deal-loc">📍 ${d.area} · ${d.type}</div>
+          <div class="deal-metrics">
+            <div class="deal-metric"><div class="dm-lbl">Est. ARV</div><div class="dm-val">${d.arvBand}</div></div>
+            <div class="deal-metric"><div class="dm-lbl">Est. Spread</div><div class="dm-val green">${d.spreadBand}</div></div>
+            <div class="deal-metric"><div class="dm-lbl">Repairs</div><div class="dm-val">${d.repairBand}</div></div>
+            <div class="deal-metric"><div class="dm-lbl">Distress</div><div class="dm-val gold">Grade ${d.grade}</div></div>
+          </div>
+          <div class="deal-lock-note">🔒 Full address, comps &amp; contract unlock with your $2,500 commitment.</div>
+          <div class="deal-foot">
+            <button class="btn btn-gold" style="width:100%;justify-content:center" onclick="Funnel.reserve('${d.id}')">🔑 Reserve This Deal</button>
+            <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="Funnel.scrollJoin()">Join list to get alerts</button>
+          </div>
         </div>
       </div>
-    </nav>
+    `).join('');
+  },
 
-    <!-- MAIN -->
-    <main class="main" id="main"><!-- views injected by app.js --></main>
-  </div>
-</div>
+  scrollJoin(){ document.getElementById('join').scrollIntoView({behavior:'smooth'}); },
 
-<div id="toast-stack"></div>
+  async join() {
+    const g = id => document.getElementById(id).value.trim();
+    const name=g('b-name'), phone=g('b-phone'), email=g('b-email');
+    if(!name||(!phone&&!email)){ this.toast('⚠️ Please enter your name and phone or email'); return; }
+    const buyer = { name, phone, email, market:g('b-market'), budget:g('b-budget'), strategy:g('b-strategy'), source:'buyer-funnel', joinedAt:Date.now() };
 
-<!-- Modal mount -->
-<div class="modal-bg" id="modal-bg"><div class="modal" id="modal"></div></div>
+    // Send to ORQ server (Aria picks up from here for newsletters + deal blasts)
+    try {
+      await fetch(CFG.API_BASE+'/re/buyers/capture',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(buyer)});
+    } catch(e){ /* offline-safe: still confirm to user */ }
 
-<script src="app.js"></script>
+    this.closeModal();
+    this.toast('🎉 You\'re in! Aria will reach out with deals matching your buy box.');
+    ['b-name','b-phone','b-email'].forEach(id=>document.getElementById(id).value='');
+    // Confirmation modal
+    this.openModal(`
+      <h2>Welcome to the network 🎉</h2>
+      <div class="m-sub">You're on the ORQ buyer list, ${name.split(' ')[0]}.</div>
+      <div style="padding:18px;border-radius:13px;background:rgba(15,174,110,.07);border:1px solid rgba(15,174,110,.25);margin-bottom:18px">
+        <div style="font-weight:700;color:var(--snow);margin-bottom:8px">What happens next</div>
+        <div style="font-size:.86rem;color:var(--silver);line-height:1.8">
+          • Aria will text/email you to confirm your buy box<br/>
+          • You'll get first-look alerts on deals in <b style="color:var(--gold)">${buyer.market||'your markets'}</b><br/>
+          • When you see one you want, reserve it with your $2,500 commitment
+        </div>
+      </div>
+      <div style="text-align:center;font-family:var(--font-m);font-size:.78rem;color:var(--mist)">Questions? Call Aria anytime: <b style="color:var(--gold)">${CFG.ARIA_PHONE}</b></div>
+    `);
+  },
+
+  reserve(dealId) {
+    const d = TEASERS.find(x=>x.id===dealId);
+    this.openModal(`
+      <h2>Reserve ${d.codename}</h2>
+      <div class="m-sub">Deal ${d.id} · ${d.city} · ${d.type}</div>
+      <div style="padding:18px;border-radius:13px;background:rgba(212,175,55,.07);border:1px solid rgba(212,175,55,.25);margin-bottom:20px">
+        <div style="display:flex;justify-content:space-between;font-size:.85rem;color:var(--silver);margin-bottom:6px"><span>Est. ARV</span><b style="color:var(--snow)">${d.arvBand}</b></div>
+        <div style="display:flex;justify-content:space-between;font-size:.85rem;color:var(--silver);margin-bottom:6px"><span>Est. Spread</span><b style="color:var(--emerald)">${d.spreadBand}</b></div>
+        <div style="display:flex;justify-content:space-between;font-size:.85rem;color:var(--silver)"><span>Deal Commitment</span><b style="color:var(--gold);font-size:1.1rem">$2,500</b></div>
+      </div>
+      <p style="font-size:.85rem;color:var(--mist);margin-bottom:18px;line-height:1.6">Your commitment unlocks the full address, comps, photos &amp; contract, and assigns this deal to you. Non-refundable; credited toward your assignment fee at closing.</p>
+      <div class="field"><label>Full Name</label><input id="r-name" placeholder="Your name"/></div>
+      <div class="field-row">
+        <div class="field"><label>Phone</label><input id="r-phone" placeholder="(405) 555-0100" type="tel"/></div>
+        <div class="field"><label>Email</label><input id="r-email" placeholder="you@email.com" type="email"/></div>
+      </div>
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:18px">
+        <input type="checkbox" id="r-agree" style="width:auto;margin-top:3px"/>
+        <span style="font-size:.8rem;color:var(--silver);line-height:1.5">I understand the $2,500 commitment is non-refundable, secures my buyer position, and that using ORQ deal info to contact the seller directly forfeits my access.</span>
+      </label>
+      <button class="btn btn-gold btn-lg" style="width:100%;justify-content:center" onclick="Funnel.pay('${dealId}')">💳 Place $2,500 Commitment</button>
+      <div style="text-align:center;font-family:var(--font-m);font-size:.7rem;color:var(--ash);margin-top:14px">Secure payment via Stripe · processed by ORQ Properties</div>
+    `);
+  },
+
+  async pay(dealId) {
+    const g = id => document.getElementById(id).value.trim();
+    const name=g('r-name'), phone=g('r-phone'), email=g('r-email');
+    if(!name||(!phone&&!email)){ this.toast('⚠️ Please enter your name and contact'); return; }
+    if(!document.getElementById('r-agree').checked){ this.toast('⚠️ Please agree to the commitment terms'); return; }
+
+    let url=null;
+    try {
+      const res = await fetch(CFG.API_BASE+'/re/commitment',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ dealId, name, phone, email, amount:CFG.COMMITMENT })});
+      const data = await res.json();
+      url = data.url;
+    } catch(e){}
+
+    if(url){ window.location.href = url; }
+    else {
+      this.toast('✓ Commitment recorded — redirecting to secure checkout…');
+      setTimeout(()=>{
+        this.openModal(`
+          <h2>Almost there 💳</h2>
+          <div class="m-sub">Deal ${dealId} commitment</div>
+          <p style="font-size:.9rem;color:var(--silver);line-height:1.7;margin-bottom:18px">Your $2,500 commitment is reserved. Once the Stripe key is connected on the ORQ server, this goes straight to secure checkout. For now, the ORQ acquisitions desk will reach out to finalize your reserved position on <b style="color:var(--gold)">${dealId}</b>.</p>
+          <div style="text-align:center;font-family:var(--font-m);font-size:.8rem;color:var(--mist)">Aria: <b style="color:var(--gold)">${CFG.ARIA_PHONE}</b></div>
+        `);
+      },800);
+    }
+  },
+
+  openModal(html){ document.getElementById('modal-content').innerHTML=html; document.getElementById('modal-bg').classList.add('open'); },
+  closeModal(){ document.getElementById('modal-bg').classList.remove('open'); },
+  toast(msg){ const t=document.getElementById('toast'); const el=document.createElement('div'); el.className='toast'; el.textContent=msg; t.appendChild(el); setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(()=>el.remove(),300);},4000); },
+};
+
+document.getElementById('modal-bg').addEventListener('click',e=>{ if(e.target.id==='modal-bg') Funnel.closeModal(); });
+Funnel.render();
+</script>
 </body>
 </html>

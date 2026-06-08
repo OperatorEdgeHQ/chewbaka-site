@@ -18,6 +18,7 @@ const CONFIG = {
   // Financial protection rules
   MIN_ASSIGNMENT_FEE: 2500,
   MAX_ASSIGNMENT_FEE: 100000,
+  COMMITMENT_FEE: 2500,     // non-refundable buyer deal commitment
   // Deal economics defaults
   MAO_PCT: 0.70,            // Maximum Allowable Offer = 70% ARV - repairs
 };
@@ -106,6 +107,9 @@ const Store = {
     pipeline: [],       // approved deals moving through stages
     buyers: [],         // buyer database
     deals: [],          // closed/collected deals
+    community: [],      // captured buyer leads from the funnel (CRM)
+    commitments: [],    // $2,500 commitment fees collected
+    campaigns: [],      // Aria/Ulio marketing campaigns sent
     automation: 'paused', // running | paused | stopped
     settings: { dryRun: true },
   },
@@ -116,6 +120,9 @@ const Store = {
       if (raw) this.data = { ...this.data, ...JSON.parse(raw) };
     } catch (e) { console.warn('state load failed', e); }
     if (this.data.buyers.length === 0) this.data.buyers = SEED_BUYERS.slice();
+    if (!this.data.community) this.data.community = SEED_COMMUNITY.slice();
+    if (!this.data.commitments) this.data.commitments = [];
+    if (!this.data.campaigns) this.data.campaigns = [];
   },
 
   save() {
@@ -136,6 +143,14 @@ const SEED_BUYERS = [
   { id:'b2', name:'Torres Capital LLC', org:'Torres Capital', phone:'(817) 555-0200', email:'deals@torrescap.com', markets:['Fort Worth','Dallas'], type:'Buy & Hold', budgetLow:80000, budgetHigh:250000, closeDays:21, proofOfFunds:true, deals12mo:15, verified:true },
   { id:'b3', name:'Sarah K. Whitfield', org:'Whitfield Realty Group', phone:'(918) 555-0300', email:'sarah@wrg.net', markets:['Tulsa','Oklahoma City'], type:'Wholesale', budgetLow:40000, budgetHigh:90000, closeDays:7, proofOfFunds:true, deals12mo:22, verified:true },
   { id:'b4', name:'Apex REI Group', org:'Apex REI', phone:'(214) 555-0400', email:'acq@apexrei.com', markets:['Dallas','Fort Worth'], type:'Fix & Flip', budgetLow:100000, budgetHigh:400000, closeDays:10, proofOfFunds:true, deals12mo:31, verified:true },
+];
+
+// Buyer community CRM seed — funnel leads at various stages
+const SEED_COMMUNITY = [
+  { id:'c1', name:'Derek Alvarez', phone:'(580) 555-0710', email:'derek@flipokc.com', market:'Lawton, OK', budget:'$75k – $150k', strategy:'Fix & Flip', stage:'committed', source:'buyer-funnel', joinedAt:Date.now()-86400000*6, lastTouch:Date.now()-86400000*1 },
+  { id:'c2', name:'Yvonne Carter', phone:'(918) 555-0822', email:'yvonne.c@gmail.com', market:'Tulsa, OK', budget:'$75k – $150k', strategy:'Buy & Hold', stage:'subscriber', source:'buyer-funnel', joinedAt:Date.now()-86400000*4, lastTouch:Date.now()-86400000*2 },
+  { id:'c3', name:'Brandon Lee', phone:'(405) 555-0933', email:'blee@reicapital.io', market:'Oklahoma City, OK', budget:'$150k – $300k', strategy:'BRRRR', stage:'lead', source:'buyer-funnel', joinedAt:Date.now()-86400000*2, lastTouch:null },
+  { id:'c4', name:'Monica Reyes', phone:'(817) 555-0144', email:'monica@reyesholdings.com', market:'Fort Worth, TX', budget:'$150k – $300k', strategy:'Fix & Flip', stage:'subscriber', source:'buyer-funnel', joinedAt:Date.now()-86400000*1, lastTouch:Date.now()-3600000*5 },
 ];
 
 // ── SIGNAL DEFINITIONS ────────────────────────────────────────────────
@@ -256,6 +271,7 @@ const App = {
     set('nb-leads', d.leads.filter(l=>!l.reviewed).length, d.leads.some(l=>!l.reviewed));
     set('nb-pipeline', d.pipeline.length, d.pipeline.length>0);
     set('nb-vault', d.deals.filter(x=>x.status==='collected').length, d.deals.length>0);
+    set('nb-community', (d.community||[]).filter(c=>c.stage==='lead').length, (d.community||[]).some(c=>c.stage==='lead'));
   },
 
   updateAutomationPill() {
@@ -977,6 +993,7 @@ Views.vault = {
     const pending = deals.filter(x=>x.status==='pending');
     const totalCollected = collected.reduce((s,x)=>s+(x.fee||0),0);
     const totalPending = pending.reduce((s,x)=>s+(x.fee||0),0);
+    const commitRevenue = (Store.data.commitments||[]).reduce((s,c)=>s+(c.amount||0),0);
 
     document.getElementById('view-vault').innerHTML = `
       <div class="page-head">
@@ -1001,8 +1018,8 @@ Views.vault = {
           <div class="s-lbl">Avg Assignment Fee</div><div class="s-delta flat">per deal</div>
         </div>
         <div class="stat" style="--c:var(--gold)">
-          <span class="s-ico">🔐</span><div class="s-val">100%</div>
-          <div class="s-lbl">Contract-Backed</div><div class="s-delta gold">No unsecured fees</div>
+          <span class="s-ico">🔐</span><div class="s-val">${fmt(commitRevenue)}</div>
+          <div class="s-lbl">Commitment Revenue</div><div class="s-delta gold">${(Store.data.commitments||[]).length} buyers · non-refundable</div>
         </div>
       </div>
 
@@ -1381,6 +1398,280 @@ Views.tools = {
         `).join('')}
       </div>
     `;
+  },
+};
+
+/* ════════════════════════════════════════════════════════════════════
+   VIEW: BUYER COMMUNITY — CRM of funnel-captured cash buyers
+   Stages: lead → subscriber → committed → closed
+   ════════════════════════════════════════════════════════════════════ */
+Views.community = {
+  filter: 'all',
+
+  render() {
+    const all = Store.data.community || [];
+    const leads = all.filter(c=>c.stage==='lead').length;
+    const subs = all.filter(c=>c.stage==='subscriber').length;
+    const committed = all.filter(c=>c.stage==='committed').length;
+    const commitRevenue = (Store.data.commitments||[]).reduce((s,c)=>s+(c.amount||0),0);
+    const shown = this.filter==='all' ? all : all.filter(c=>c.stage===this.filter);
+
+    document.getElementById('view-community').innerHTML = `
+      <div class="page-head">
+        <div><h1>Buyer Community</h1>
+          <div class="ph-sub">Cash buyers captured from the public funnel · Aria nurtures them into committed deals</div></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-ghost" onclick="window.open('https://orq-buyer-funnel-url','_blank')">↗ View Public Funnel</button>
+          <button class="btn btn-gold" onclick="Views.community.addManual()">+ Add Buyer</button>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat" style="--c:var(--sapphire)"><span class="s-ico">👥</span><div class="s-val">${all.length}</div><div class="s-lbl">Total Community</div><div class="s-delta up">Growing organically</div></div>
+        <div class="stat" style="--c:var(--gold)"><span class="s-ico">🆕</span><div class="s-val">${leads}</div><div class="s-lbl">New Leads</div><div class="s-delta gold">Aria to qualify</div></div>
+        <div class="stat" style="--c:var(--emerald)"><span class="s-ico">🤝</span><div class="s-val">${committed}</div><div class="s-lbl">Committed Buyers</div><div class="s-delta up">Paid commitment</div></div>
+        <div class="stat" style="--c:var(--emerald)"><span class="s-ico">💰</span><div class="s-val">${fmt(commitRevenue)}</div><div class="s-lbl">Commitment Revenue</div><div class="s-delta up">Non-refundable · ORQ Stripe</div></div>
+      </div>
+
+      <div class="card card-pad">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+          <div class="section-label" style="margin:0">Community Members <span class="sl-tag">${subs} subscribers · ${leads} new leads</span></div>
+          <div style="display:flex;gap:6px">
+            ${[['all','All'],['lead','New'],['subscriber','Subscribers'],['committed','Committed'],['closed','Closed']].map(([k,l])=>`
+              <button class="btn btn-sm ${this.filter===k?'btn-gold':'btn-ghost'}" onclick="Views.community.setFilter('${k}')">${l}</button>
+            `).join('')}
+          </div>
+        </div>
+        ${shown.length===0?`<div style="text-align:center;padding:36px;color:var(--mist);font-size:.88rem">No buyers in this view yet.</div>`:`
+          <table style="width:100%;border-collapse:collapse">
+            <thead><tr style="text-align:left">${['Buyer','Market','Buy Box','Stage','Last Touch','Actions'].map(h=>`<th style="font-family:var(--font-m);font-size:.64rem;color:var(--ash);letter-spacing:.08em;text-transform:uppercase;padding:10px 12px;border-bottom:var(--border)">${h}</th>`).join('')}</tr></thead>
+            <tbody>
+              ${shown.sort((a,b)=>b.joinedAt-a.joinedAt).map(c=>this.row(c)).join('')}
+            </tbody>
+          </table>
+        `}
+      </div>
+    `;
+  },
+
+  stageBadge(stage) {
+    const m = {
+      lead:['var(--gold)','🆕 New Lead'],
+      subscriber:['var(--sapphire)','📬 Subscriber'],
+      committed:['var(--emerald)','🤝 Committed'],
+      closed:['var(--emerald)','✓ Closed'],
+    }[stage] || ['var(--mist)', stage];
+    return `<span style="font-family:var(--font-m);font-size:.64rem;font-weight:700;padding:4px 10px;border-radius:100px;background:${m[0]}1a;color:${m[0]}">${m[1]}</span>`;
+  },
+
+  row(c) {
+    const touch = c.lastTouch ? new Date(c.lastTouch).toLocaleDateString() : '<span style="color:var(--amber)">Never</span>';
+    return `<tr style="border-bottom:1px solid rgba(255,255,255,.03)">
+      <td style="padding:13px 12px"><div style="font-weight:700;color:var(--snow);font-size:.84rem">${c.name}</div><div style="font-size:.72rem;color:var(--mist)">${c.email||c.phone}</div></td>
+      <td style="padding:13px 12px;color:var(--silver);font-size:.82rem">${c.market||'—'}</td>
+      <td style="padding:13px 12px;color:var(--silver);font-size:.8rem">${c.budget||'—'}<br/><span style="color:var(--mist);font-size:.72rem">${c.strategy||''}</span></td>
+      <td style="padding:13px 12px">${this.stageBadge(c.stage)}</td>
+      <td style="padding:13px 12px;color:var(--mist);font-size:.78rem">${touch}</td>
+      <td style="padding:13px 12px">
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm btn-ghost" title="Call" onclick="window.open('tel:${c.phone}')">📞</button>
+          <button class="btn btn-sm btn-ghost" title="Email" onclick="window.open('mailto:${c.email}')">📧</button>
+          ${c.stage==='lead'?`<button class="btn btn-sm btn-sapphire" onclick="Views.community.advance('${c.id}','subscriber')">→ Qualify</button>`:''}
+          ${c.stage==='subscriber'?`<button class="btn btn-sm btn-emerald" onclick="Views.community.recordCommitment('${c.id}')">💳 Commitment</button>`:''}
+        </div>
+      </td>
+    </tr>`;
+  },
+
+  setFilter(f){ this.filter=f; this.render(); },
+
+  advance(id, stage) {
+    const c = Store.data.community.find(x=>x.id===id);
+    if(!c) return;
+    c.stage = stage; c.lastTouch = Date.now();
+    Store.save(); App.updateNavBadges();
+    Toast.show('ok','✓',`${c.name} → ${stage}`);
+    this.render();
+  },
+
+  recordCommitment(id) {
+    const c = Store.data.community.find(x=>x.id===id);
+    if(!c) return;
+    Modal.open(`
+      <h2>Record $2,500 Commitment</h2>
+      <div class="m-sub">Buyer: ${c.name} · Non-refundable · routes to ORQ Stripe</div>
+      <div class="field"><label>Deal / Property reserved</label><input id="cm-deal" placeholder="e.g. LAW-1428 Cache Road"/></div>
+      <div class="field"><label>Commitment Amount</label><input id="cm-amt" type="number" value="${CONFIG.COMMITMENT_FEE}"/></div>
+      <div class="field"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="cm-confirm" style="width:auto"/><span style="font-weight:600;color:var(--silver)">Buyer agreed to non-refundable terms</span></label></div>
+      <div class="m-actions">
+        <button class="btn btn-ghost" onclick="Modal.close()">Cancel</button>
+        <button class="btn btn-emerald" onclick="Views.community.executeCommitment('${id}')">🛡️ Collect Commitment</button>
+      </div>
+      <div id="cm-result" style="display:none;margin-top:16px;padding:13px;border-radius:10px;background:rgba(15,174,110,.08);border:1px solid rgba(15,174,110,.3);font-family:var(--font-m);font-size:.76rem;color:var(--emerald)"></div>
+    `);
+  },
+
+  async executeCommitment(id) {
+    if(!document.getElementById('cm-confirm').checked){ Toast.show('err','🔒','Confirm the buyer agreed to terms'); return; }
+    const c = Store.data.community.find(x=>x.id===id);
+    const deal = document.getElementById('cm-deal').value;
+    const amt = +document.getElementById('cm-amt').value || CONFIG.COMMITMENT_FEE;
+
+    const res = await API.call('/re/commitment', { method:'POST', body: JSON.stringify({
+      buyerName:c.name, email:c.email, phone:c.phone, dealId:deal, amount:amt, nonRefundable:true,
+    })});
+
+    const result = document.getElementById('cm-result');
+    result.style.display='block';
+    result.innerHTML = (res && res.url)
+      ? `✓ Stripe link: <a href="${res.url}" target="_blank" style="color:var(--sapphire)">${res.url}</a>`
+      : `✓ Commitment recorded — ${fmt(amt)} → ORQ Stripe (connect key on server to auto-charge).`;
+
+    c.stage='committed'; c.lastTouch=Date.now();
+    Store.data.commitments.push({ id:'CM'+Date.now(), buyerId:id, buyer:c.name, deal, amount:amt, date:Date.now(), nonRefundable:true });
+    Store.save(); App.updateNavBadges();
+    Toast.show('ok','🛡️',`${fmt(amt)} commitment collected from ${c.name}`);
+    setTimeout(()=>this.render(), 900);
+  },
+
+  addManual() {
+    Modal.open(`
+      <h2>Add Buyer to Community</h2>
+      <div class="m-sub">Manually add a cash buyer to the nurture list.</div>
+      <div class="field"><label>Name</label><input id="ac-name" placeholder="Buyer name"/></div>
+      <div class="field-row" style="display:flex;gap:12px">
+        <div class="field" style="flex:1"><label>Phone</label><input id="ac-phone" placeholder="(405) 555-0000"/></div>
+        <div class="field" style="flex:1"><label>Email</label><input id="ac-email" placeholder="email@x.com"/></div>
+      </div>
+      <div class="field"><label>Market</label><input id="ac-market" placeholder="Lawton, OK"/></div>
+      <div class="m-actions"><button class="btn btn-ghost" onclick="Modal.close()">Cancel</button><button class="btn btn-gold" onclick="Views.community.saveManual()">Add</button></div>
+    `);
+  },
+
+  saveManual() {
+    const g=id=>document.getElementById(id).value;
+    const name=g('ac-name'); if(!name){ Toast.show('warn','⚠','Name required'); return; }
+    Store.data.community.push({ id:'c'+Date.now(), name, phone:g('ac-phone'), email:g('ac-email'), market:g('ac-market'), stage:'lead', source:'manual', joinedAt:Date.now(), lastTouch:null });
+    Store.save(); Modal.close(); App.updateNavBadges();
+    Toast.show('ok','✓',`${name} added to community`);
+    this.render();
+  },
+};
+
+/* ════════════════════════════════════════════════════════════════════
+   VIEW: DEAL MARKETING — Aria/Ulio newsletters + blind deal blasts
+   ════════════════════════════════════════════════════════════════════ */
+Views.marketing = {
+  render() {
+    const community = Store.data.community || [];
+    const reachable = community.filter(c=>c.email||c.phone).length;
+    const campaigns = Store.data.campaigns || [];
+    const teasers = Store.data.pipeline.filter(d=>d.stage==='buyer'||d.stage==='outreach'||d.stage==='contract');
+
+    document.getElementById('view-marketing').innerHTML = `
+      <div class="page-head">
+        <div><h1>Deal Marketing</h1>
+          <div class="ph-sub">Aria runs your newsletters &amp; blind deal blasts · grows the buyer community organically</div></div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat" style="--c:var(--sapphire)"><span class="s-ico">📣</span><div class="s-val">${reachable}</div><div class="s-lbl">Reachable Buyers</div><div class="s-delta flat">email + SMS</div></div>
+        <div class="stat" style="--c:var(--gold)"><span class="s-ico">🏠</span><div class="s-val">${teasers.length}</div><div class="s-lbl">Deals to Promote</div><div class="s-delta gold">blind teasers ready</div></div>
+        <div class="stat" style="--c:var(--emerald)"><span class="s-ico">✉️</span><div class="s-val">${campaigns.length}</div><div class="s-lbl">Campaigns Sent</div><div class="s-delta up">via Aria / Ulio</div></div>
+        <div class="stat" style="--c:var(--violet)"><span class="s-ico">📈</span><div class="s-val">${community.filter(c=>c.stage==='committed').length}</div><div class="s-lbl">Conversions</div><div class="s-delta up">lead → committed</div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:22px">
+        <div class="card card-pad">
+          <div class="section-label">📬 Send Deal Blast <span class="sl-tag">blind teaser · address stays sealed</span></div>
+          <p style="font-size:.82rem;color:var(--mist);margin-bottom:14px;line-height:1.6">Aria sends a blind teaser (market, numbers, grade — no address) to matched buyers. They must commit $2,500 to unlock details. Protects you from circumvention.</p>
+          <div class="field" style="margin-bottom:12px">
+            <label>Select deal to promote</label>
+            <select id="mk-deal" style="width:100%;background:rgba(5,8,12,.5);border:var(--border-bright);border-radius:10px;padding:11px 13px;color:var(--snow);font-family:var(--font-b);outline:none">
+              ${teasers.length?teasers.map(d=>`<option value="${d.id}">${d.address} · Grade ${d.grade} · ARV ${fmt(d.arv)}</option>`).join(''):'<option value="">No deals in pipeline yet</option>'}
+            </select>
+          </div>
+          <div class="field" style="margin-bottom:14px">
+            <label>Audience</label>
+            <select id="mk-audience" style="width:100%;background:rgba(5,8,12,.5);border:var(--border-bright);border-radius:10px;padding:11px 13px;color:var(--snow);font-family:var(--font-b);outline:none">
+              <option value="all">Entire community (${reachable})</option>
+              <option value="matched">Market-matched buyers only</option>
+              <option value="committed">Committed buyers (VIP first-look)</option>
+            </select>
+          </div>
+          <button class="btn btn-gold" style="width:100%;justify-content:center" onclick="Views.marketing.sendBlast()" ${teasers.length?'':'disabled'}>📤 Send Blind Deal Blast via Aria</button>
+        </div>
+
+        <div class="card card-pad">
+          <div class="section-label">📰 Community Newsletter <span class="sl-tag">nurture · stay top-of-mind</span></div>
+          <p style="font-size:.82rem;color:var(--mist);margin-bottom:14px;line-height:1.6">Aria sends a branded newsletter to the whole community — market updates, recent closes, new inventory teasers. Builds trust &amp; keeps buyers warm.</p>
+          <div class="field" style="margin-bottom:12px"><label>Subject line</label><input id="mk-subject" placeholder="🏠 3 new off-market deals this week" style="width:100%;background:rgba(5,8,12,.5);border:var(--border-bright);border-radius:10px;padding:11px 13px;color:var(--snow);font-family:var(--font-b);outline:none"/></div>
+          <div class="field" style="margin-bottom:14px"><label>Template</label>
+            <select id="mk-template" style="width:100%;background:rgba(5,8,12,.5);border:var(--border-bright);border-radius:10px;padding:11px 13px;color:var(--snow);font-family:var(--font-b);outline:none">
+              <option>Weekly Deal Digest</option><option>New Inventory Alert</option><option>Recent Close / Social Proof</option><option>Market Update</option>
+            </select>
+          </div>
+          <button class="btn btn-sapphire" style="width:100%;justify-content:center" onclick="Views.marketing.sendNewsletter()">📰 Send Newsletter via Aria</button>
+        </div>
+      </div>
+
+      <div class="card card-pad">
+        <div class="section-label">Campaign History</div>
+        ${campaigns.length===0?`<div style="text-align:center;padding:30px;color:var(--mist);font-size:.86rem">No campaigns sent yet. Send your first deal blast or newsletter above.</div>`:`
+          <table style="width:100%;border-collapse:collapse">
+            <thead><tr style="text-align:left">${['Type','Subject / Deal','Audience','Sent','Date'].map(h=>`<th style="font-family:var(--font-m);font-size:.64rem;color:var(--ash);letter-spacing:.08em;text-transform:uppercase;padding:10px 12px;border-bottom:var(--border)">${h}</th>`).join('')}</tr></thead>
+            <tbody>${campaigns.slice().reverse().map(c=>`
+              <tr style="border-bottom:1px solid rgba(255,255,255,.03)">
+                <td style="padding:12px;font-size:.8rem">${c.type==='blast'?'📬 Deal Blast':'📰 Newsletter'}</td>
+                <td style="padding:12px;color:var(--snow);font-weight:600;font-size:.82rem">${c.subject}</td>
+                <td style="padding:12px;color:var(--silver);font-size:.8rem">${c.audience}</td>
+                <td style="padding:12px;font-family:var(--font-m);color:var(--emerald);font-size:.82rem">${c.sent}</td>
+                <td style="padding:12px;color:var(--mist);font-size:.78rem">${new Date(c.date).toLocaleDateString()}</td>
+              </tr>`).join('')}</tbody>
+          </table>
+        `}
+      </div>
+    `;
+  },
+
+  async sendBlast() {
+    const dealId = document.getElementById('mk-deal').value;
+    const audience = document.getElementById('mk-audience').value;
+    const deal = Store.data.pipeline.find(d=>d.id===dealId);
+    if(!deal){ Toast.show('warn','⚠','No deal selected'); return; }
+    const community = Store.data.community || [];
+    let recipients = community.filter(c=>c.email||c.phone);
+    if(audience==='matched') recipients = recipients.filter(c=>(c.market||'').toLowerCase().includes(deal.city.toLowerCase().slice(0,4)));
+    if(audience==='committed') recipients = recipients.filter(c=>c.stage==='committed');
+
+    if(Store.data.settings.dryRun) Toast.show('info','🧪','Dry-run — blast simulated, not actually sent');
+
+    await API.call('/re/marketing/blast', { method:'POST', body: JSON.stringify({
+      dealId, audience, recipientCount:recipients.length, dryRun:Store.data.settings.dryRun,
+      // Blind teaser only — never expose address in the blast payload
+      teaser: { grade:deal.grade, arvBand:`$${Math.floor(deal.arv/10000)*10}k`, area:deal.city, type:'Off-market distressed' },
+    })});
+
+    Store.data.campaigns.push({ id:'CP'+Date.now(), type:'blast', subject:`Blind teaser · ${deal.city} Grade ${deal.grade}`, audience:audience==='all'?'Entire community':audience==='matched'?'Market-matched':'Committed VIPs', sent:recipients.length, date:Date.now() });
+    Store.save();
+    Toast.show('ok','📬',`Blind deal blast sent to ${recipients.length} buyers via Aria`);
+    this.render();
+  },
+
+  async sendNewsletter() {
+    const subject = document.getElementById('mk-subject').value || 'ORQ Properties — New Deals';
+    const template = document.getElementById('mk-template').value;
+    const recipients = (Store.data.community||[]).filter(c=>c.email);
+    if(Store.data.settings.dryRun) Toast.show('info','🧪','Dry-run — newsletter simulated');
+
+    await API.call('/re/marketing/newsletter', { method:'POST', body: JSON.stringify({
+      subject, template, recipientCount:recipients.length, dryRun:Store.data.settings.dryRun,
+    })});
+
+    Store.data.campaigns.push({ id:'CP'+Date.now(), type:'newsletter', subject, audience:'Entire community', sent:recipients.length, date:Date.now() });
+    Store.save();
+    Toast.show('ok','📰',`Newsletter "${subject}" sent to ${recipients.length} buyers via Aria`);
+    this.render();
   },
 };
 
