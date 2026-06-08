@@ -2,959 +2,390 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>ORQ Properties — Operator Portal</title>
-<meta name="robots" content="noindex,nofollow"/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>ORQ Properties · Operator Command</title>
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet"/>
+<meta name="referrer" content="no-referrer"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --ink:#070d12;--deep:#0d1620;--navy:#111e2a;--slate:#1e2f3d;
-  --mid:#2c3f50;--mist:#6b8096;--silver:#9ab0c0;--light:#d4e0e8;
-  --white:#eef3f7;--blue:#2474ff;--blue-dim:#1a52c8;
-  --gold:#f2c14e;--green:#0f9f6e;--red:#e53e3e;--orange:#f97316;
-  --font-d:'DM Serif Display',Georgia,serif;
-  --font-b:'Syne',system-ui,sans-serif;
-  --font-m:'IBM Plex Mono','Courier New',monospace;
+  /* Deep institutional palette */
+  --void:#05080c;--abyss:#080d14;--ink:#0c131c;--carbon:#111b27;
+  --slate:#18283a;--steel:#22364d;--iron:#324b66;--ash:#5c7186;
+  --mist:#7891a8;--silver:#9fb4c8;--pearl:#c8d6e3;--snow:#eaf1f7;
+  /* Signature gold + accents */
+  --gold:#d4af37;--gold-bright:#f0cd5a;--gold-dim:#9a7d28;
+  --emerald:#0fae6e;--emerald-dim:#0a7a4d;
+  --sapphire:#2f7df6;--sapphire-dim:#1d5bc4;
+  --ruby:#e23b50;--ruby-dim:#b02438;
+  --amber:#f59e0b;--violet:#8b5cf6;
+  /* Functional */
+  --ok:var(--emerald);--warn:var(--amber);--danger:var(--ruby);--info:var(--sapphire);
+  --font-d:'Fraunces',Georgia,serif;
+  --font-b:'Inter',system-ui,-apple-system,sans-serif;
+  --font-m:'JetBrains Mono','SF Mono',monospace;
+  --glow-gold:0 0 24px rgba(212,175,55,.25);
+  --glow-emerald:0 0 24px rgba(15,174,110,.25);
+  --shadow-card:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);
+  --shadow-float:0 24px 64px rgba(0,0,0,.6);
+  --border:1px solid rgba(255,255,255,.06);
+  --border-bright:1px solid rgba(255,255,255,.1);
 }
-html{scroll-behavior:smooth}
-body{background:var(--ink);color:var(--light);font-family:var(--font-b);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:
+    radial-gradient(900px circle at 12% -5%, rgba(47,125,246,.06), transparent 45%),
+    radial-gradient(1000px circle at 95% 0%, rgba(212,175,55,.05), transparent 40%),
+    var(--void);
+  color:var(--pearl);font-family:var(--font-b);font-size:14px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;
+}
 a{color:inherit;text-decoration:none}
+::selection{background:rgba(212,175,55,.3);color:var(--snow)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:var(--abyss)}
+::-webkit-scrollbar-thumb{background:var(--steel);border-radius:5px;border:2px solid var(--abyss)}
+::-webkit-scrollbar-thumb:hover{background:var(--iron)}
 
-/* ── PASSWORD GATE ── */
+/* ════════════ AUTH GATE ════════════ */
 #gate{
-  position:fixed;inset:0;z-index:9999;
-  background:var(--ink);
-  display:flex;align-items:center;justify-content:center;
+  position:fixed;inset:0;z-index:10000;
+  background:
+    radial-gradient(800px circle at 50% 30%, rgba(212,175,55,.08), transparent 50%),
+    var(--void);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  transition:opacity .6s ease,visibility .6s;
 }
-#gate.hidden{display:none}
-.gate-box{
-  background:var(--navy);
-  border:1px solid var(--slate);
-  border-radius:16px;
-  padding:48px;
-  width:360px;
-  text-align:center;
-}
-.gate-logo{
-  font-family:var(--font-m);font-size:1rem;font-weight:600;
-  color:var(--white);margin-bottom:8px;
-}
-.gate-logo span{color:var(--gold)}
-.gate-sub{font-size:.82rem;color:var(--mist);margin-bottom:32px}
-.gate-box h2{font-family:var(--font-d);font-size:1.6rem;color:var(--white);margin-bottom:24px}
-#pin-input{
-  width:100%;background:var(--deep);border:1px solid var(--slate);
-  border-radius:8px;padding:14px;color:var(--white);
-  font-size:1.2rem;font-family:var(--font-m);letter-spacing:.3em;
-  text-align:center;outline:none;transition:border-color .2s;
-  margin-bottom:16px;
-}
-#pin-input:focus{border-color:var(--gold)}
-#pin-input::placeholder{letter-spacing:normal;font-size:.9rem;color:var(--mist)}
-.gate-btn{
-  width:100%;background:var(--gold);color:var(--ink);
-  border:none;padding:14px;border-radius:8px;
-  font-weight:800;font-size:.95rem;cursor:pointer;
-  font-family:var(--font-b);transition:opacity .2s;
-}
-.gate-btn:hover{opacity:.9}
-.gate-error{color:var(--red);font-size:.82rem;margin-top:8px;display:none}
-
-/* ── MAIN APP ── */
-#app{display:none}
-#app.visible{display:block}
-
-/* ── TOP BAR ── */
-.topbar{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 24px;height:56px;
-  background:rgba(7,13,18,.95);
-  backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--slate);
-}
-.tb-logo{font-family:var(--font-m);font-size:.95rem;font-weight:600;color:var(--white)}
-.tb-logo span{color:var(--gold)}
-.tb-badge{
-  font-family:var(--font-m);font-size:.65rem;font-weight:600;
-  letter-spacing:.1em;text-transform:uppercase;
-  background:rgba(242,193,78,.15);color:var(--gold);
-  padding:3px 10px;border-radius:100px;border:1px solid rgba(242,193,78,.3);
-}
-.tb-right{display:flex;align-items:center;gap:16px}
-.tb-link{font-size:.78rem;font-weight:600;color:var(--mist);text-transform:uppercase;letter-spacing:.05em;transition:color .2s;cursor:pointer}
-.tb-link:hover{color:var(--white)}
-#lock-btn{
-  background:var(--slate);border:none;color:var(--mist);
-  padding:6px 14px;border-radius:6px;font-size:.75rem;
-  font-weight:600;cursor:pointer;font-family:var(--font-b);
-  transition:background .2s;
-}
-#lock-btn:hover{background:var(--mid);color:var(--light)}
-
-/* ── SIDEBAR ── */
-.layout{display:flex;padding-top:56px;min-height:100vh}
-.sidebar{
-  width:220px;flex-shrink:0;
-  background:var(--deep);
-  border-right:1px solid var(--slate);
-  position:fixed;top:56px;left:0;bottom:0;
-  overflow-y:auto;padding:20px 0;
-}
-.sb-section{
-  font-family:var(--font-m);font-size:.65rem;font-weight:600;
-  letter-spacing:.12em;text-transform:uppercase;
-  color:var(--mist);padding:0 20px;margin:16px 0 6px;
-}
-.sb-link{
+#gate.unlocked{opacity:0;visibility:hidden;pointer-events:none}
+.gate-mark{
+  font-family:var(--font-m);font-size:.7rem;font-weight:600;letter-spacing:.3em;
+  color:var(--gold);text-transform:uppercase;margin-bottom:40px;
   display:flex;align-items:center;gap:10px;
-  padding:9px 20px;font-size:.85rem;font-weight:600;
-  color:var(--silver);cursor:pointer;transition:all .15s;
-  border-left:3px solid transparent;
 }
-.sb-link:hover,.sb-link.active{
-  color:var(--white);background:rgba(255,255,255,.04);
+.gate-mark::before,.gate-mark::after{content:'';width:32px;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim))}
+.gate-mark::after{background:linear-gradient(90deg,var(--gold-dim),transparent)}
+.gate-card{
+  width:400px;max-width:92vw;
+  background:linear-gradient(160deg, rgba(24,40,58,.6), rgba(12,19,28,.9));
+  border:var(--border-bright);border-radius:20px;
+  padding:44px 40px;text-align:center;
+  box-shadow:var(--shadow-float),inset 0 1px 0 rgba(255,255,255,.05);
+  backdrop-filter:blur(20px);
+}
+.gate-crest{
+  width:64px;height:64px;margin:0 auto 24px;border-radius:16px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-dim));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-d);font-size:2rem;font-weight:600;color:var(--void);
+  box-shadow:var(--glow-gold);
+}
+.gate-card h1{font-family:var(--font-d);font-size:1.7rem;font-weight:600;color:var(--snow);margin-bottom:6px;letter-spacing:-.01em}
+.gate-card .sub{font-size:.8rem;color:var(--mist);margin-bottom:32px;font-weight:500}
+.gate-field{position:relative;margin-bottom:14px}
+.gate-field input{
+  width:100%;background:rgba(5,8,12,.6);border:var(--border-bright);border-radius:11px;
+  padding:15px 18px;color:var(--snow);font-size:1rem;font-family:var(--font-m);
+  letter-spacing:.15em;text-align:center;outline:none;transition:all .25s;
+}
+.gate-field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.12)}
+.gate-field input::placeholder{letter-spacing:.05em;color:var(--ash);font-size:.85rem}
+.gate-btn{
+  width:100%;margin-top:8px;padding:15px;border:none;border-radius:11px;cursor:pointer;
+  background:linear-gradient(135deg,var(--gold-bright),var(--gold));
+  color:var(--void);font-family:var(--font-b);font-weight:800;font-size:.95rem;
+  letter-spacing:.02em;transition:all .25s;position:relative;overflow:hidden;
+}
+.gate-btn:hover{transform:translateY(-1px);box-shadow:var(--glow-gold)}
+.gate-btn:active{transform:translateY(0)}
+.gate-err{
+  color:var(--ruby);font-size:.8rem;margin-top:14px;font-weight:600;
+  opacity:0;transition:opacity .3s;height:18px;
+}
+.gate-err.show{opacity:1}
+.gate-lock-meta{
+  margin-top:28px;font-family:var(--font-m);font-size:.66rem;color:var(--ash);
+  letter-spacing:.08em;line-height:1.8;
+}
+.gate-lock-meta .dot{color:var(--emerald)}
+.gate-foot{
+  position:fixed;bottom:28px;left:0;right:0;text-align:center;
+  font-family:var(--font-m);font-size:.62rem;color:var(--steel);letter-spacing:.15em;
+}
+
+/* ════════════ APP SHELL ════════════ */
+#app{opacity:0;transition:opacity .6s ease .2s;min-height:100vh}
+#app.live{opacity:1}
+
+/* Top command bar */
+.cmdbar{
+  position:fixed;top:0;left:0;right:0;z-index:200;height:60px;
+  display:flex;align-items:center;justify-content:space-between;padding:0 24px;
+  background:linear-gradient(180deg, rgba(8,13,20,.96), rgba(8,13,20,.82));
+  border-bottom:var(--border);backdrop-filter:blur(20px);
+}
+.cmd-brand{display:flex;align-items:center;gap:14px}
+.cmd-logo{
+  width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-dim));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-d);font-weight:600;font-size:1.15rem;color:var(--void);
+}
+.cmd-title{font-family:var(--font-m);font-size:.82rem;font-weight:600;color:var(--snow);letter-spacing:.02em}
+.cmd-title b{color:var(--gold)}
+.cmd-env{
+  font-family:var(--font-m);font-size:.6rem;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--emerald);
+  background:rgba(15,174,110,.1);border:1px solid rgba(15,174,110,.25);
+  padding:3px 9px;border-radius:100px;
+}
+.cmd-right{display:flex;align-items:center;gap:8px}
+.cmd-clock{font-family:var(--font-m);font-size:.72rem;color:var(--mist);margin-right:8px}
+.cmd-icon-btn{
+  width:36px;height:36px;border-radius:9px;border:var(--border);
+  background:rgba(255,255,255,.02);color:var(--silver);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s;
+}
+.cmd-icon-btn:hover{background:rgba(255,255,255,.06);color:var(--snow)}
+.cmd-lock{
+  font-family:var(--font-b);font-weight:700;font-size:.76rem;
+  padding:8px 16px;border-radius:9px;border:1px solid rgba(226,59,80,.3);
+  background:rgba(226,59,80,.08);color:#ff8896;cursor:pointer;transition:all .2s;
+}
+.cmd-lock:hover{background:rgba(226,59,80,.16)}
+
+/* Layout */
+.shell{display:flex;padding-top:60px;min-height:100vh}
+.nav{
+  width:230px;flex-shrink:0;position:fixed;top:60px;left:0;bottom:0;
+  background:linear-gradient(180deg, var(--abyss), var(--void));
+  border-right:var(--border);overflow-y:auto;padding:18px 0 40px;
+}
+.nav-grp{margin-bottom:6px}
+.nav-grp-label{
+  font-family:var(--font-m);font-size:.6rem;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ash);padding:14px 22px 8px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:12px;padding:10px 22px;cursor:pointer;
+  font-size:.86rem;font-weight:600;color:var(--silver);transition:all .18s;
+  border-left:2px solid transparent;position:relative;
+}
+.nav-item:hover{background:rgba(255,255,255,.03);color:var(--snow)}
+.nav-item.on{
+  color:var(--snow);background:linear-gradient(90deg, rgba(212,175,55,.1), transparent);
   border-left-color:var(--gold);
 }
-.sb-link .icon{font-size:1rem;width:20px;text-align:center}
-.sb-count{
-  margin-left:auto;background:var(--blue);color:#fff;
-  font-family:var(--font-m);font-size:.65rem;font-weight:600;
-  padding:2px 7px;border-radius:100px;
-}
-
-/* ── MAIN CONTENT ── */
-.main{margin-left:220px;padding:28px 32px;min-height:calc(100vh - 56px)}
-
-/* ── VIEWS ── */
-.view{display:none}
-.view.active{display:block}
-
-/* ── COMMAND CENTER ── */
-.cmd-header{margin-bottom:28px}
-.cmd-header h1{font-family:var(--font-d);font-size:2.2rem;color:var(--white);letter-spacing:-.02em;margin-bottom:4px}
-.cmd-header p{color:var(--mist);font-size:.9rem}
-.live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:6px;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
-
-/* Stats grid */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
-.stat-card{background:var(--navy);border:1px solid var(--slate);border-radius:12px;padding:20px;position:relative;overflow:hidden}
-.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--card-color,var(--blue))}
-.stat-n{font-family:var(--font-m);font-size:1.8rem;font-weight:600;color:var(--white);display:block;margin-bottom:2px}
-.stat-l{font-size:.75rem;color:var(--mist);text-transform:uppercase;letter-spacing:.05em}
-.stat-delta{font-family:var(--font-m);font-size:.72rem;margin-top:8px;display:block}
-.delta-up{color:var(--green)}.delta-new{color:var(--gold)}
-
-/* Pipeline */
-.section-title{font-family:var(--font-b);font-size:1rem;font-weight:800;color:var(--white);margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.pipeline-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
-.pipe-col{background:var(--navy);border:1px solid var(--slate);border-radius:10px;padding:14px;min-height:200px}
-.pipe-head{font-family:var(--font-m);font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--mist);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
-.pipe-card{background:var(--slate);border-radius:7px;padding:10px;margin-bottom:8px;cursor:pointer;transition:background .15s}
-.pipe-card:hover{background:var(--mid)}
-.pc-addr{font-size:.8rem;font-weight:700;color:var(--white);margin-bottom:2px}
-.pc-city{font-size:.72rem;color:var(--mist)}
-.pc-score{font-family:var(--font-m);font-size:.7rem;font-weight:600;margin-top:6px}
-
-/* Quick actions */
-.quick-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px}
-.qa-btn{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:10px 18px;border-radius:8px;font-weight:700;font-size:.83rem;
-  border:none;cursor:pointer;font-family:var(--font-b);transition:all .15s;
-}
-
-/* ── SEARCH ENGINE ── */
-.search-engine{max-width:900px}
-.search-form{background:var(--navy);border:1px solid var(--slate);border-radius:12px;padding:24px;margin-bottom:24px}
-.search-form h2{font-family:var(--font-d);font-size:1.6rem;color:var(--white);margin-bottom:4px}
-.search-form p{color:var(--mist);font-size:.85rem;margin-bottom:20px}
-.source-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
-.source-item{background:var(--deep);border:1px solid var(--slate);border-radius:8px;padding:12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color .2s}
-.source-item.selected{border-color:var(--gold)}
-.source-cb{width:16px;height:16px;accent-color:var(--gold);flex-shrink:0}
-.source-info strong{display:block;font-size:.82rem;font-weight:700;color:var(--white)}
-.source-info span{font-size:.72rem;color:var(--mist)}
-.market-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
-.mkt-pill{padding:6px 14px;border-radius:100px;border:1px solid var(--slate);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s;color:var(--mist)}
-.mkt-pill.on{background:var(--gold);color:var(--ink);border-color:var(--gold)}
-.run-btn{width:100%;background:var(--gold);color:var(--ink);border:none;padding:14px;border-radius:8px;font-weight:800;font-size:.95rem;cursor:pointer;font-family:var(--font-b);transition:opacity .2s}
-.run-btn:hover{opacity:.9}
-.run-btn:disabled{opacity:.5;cursor:not-allowed}
-
-/* Results */
-.result-card{background:var(--navy);border:1px solid var(--slate);border-radius:10px;padding:16px;margin-bottom:10px;display:flex;gap:16px;align-items:flex-start;transition:border-color .2s}
-.result-card:hover{border-color:var(--blue)}
-.rc-score{
-  width:52px;height:52px;border-radius:50%;
+.nav-item .ni-icon{font-size:1.05rem;width:22px;text-align:center;opacity:.9}
+.nav-item .ni-badge{
+  margin-left:auto;font-family:var(--font-m);font-size:.62rem;font-weight:700;
+  min-width:20px;height:18px;padding:0 6px;border-radius:100px;
   display:flex;align-items:center;justify-content:center;
-  font-family:var(--font-m);font-size:1rem;font-weight:600;
-  flex-shrink:0;
+  background:var(--sapphire);color:#fff;
 }
-.grade-A{background:rgba(229,62,62,.15);color:var(--red)}
-.grade-B{background:rgba(249,115,22,.15);color:var(--orange)}
-.grade-C{background:rgba(242,193,78,.15);color:var(--gold)}
-.grade-D{background:rgba(107,128,150,.15);color:var(--mist)}
-.rc-body{flex:1}
-.rc-addr{font-size:.95rem;font-weight:800;color:var(--white);margin-bottom:2px}
-.rc-city{font-size:.78rem;color:var(--mist);margin-bottom:8px}
-.rc-signals{display:flex;gap:6px;flex-wrap:wrap}
-.signal-tag{font-family:var(--font-m);font-size:.67rem;font-weight:600;padding:3px 8px;border-radius:4px}
-.rc-actions{display:flex;gap:8px;margin-top:10px}
-.act-btn{padding:6px 12px;border-radius:6px;font-size:.75rem;font-weight:700;border:none;cursor:pointer;font-family:var(--font-b)}
+.nav-item .ni-badge.gold{background:var(--gold);color:var(--void)}
+.nav-item .ni-badge.red{background:var(--ruby);color:#fff}
+.nav-item .ni-badge.green{background:var(--emerald);color:#fff}
 
-/* ── BUYERS VIEW ── */
-.buyer-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-.buyer-card{background:var(--navy);border:1px solid var(--slate);border-radius:10px;padding:16px}
-.buyer-name{font-size:.95rem;font-weight:800;color:var(--white);margin-bottom:4px}
-.buyer-meta{font-size:.78rem;color:var(--mist);margin-bottom:12px}
-.buyer-pref{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.pref-tag{font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:100px;background:rgba(36,116,255,.1);color:var(--blue)}
+.nav-status{margin:20px 22px 0;padding:14px;border-radius:12px;background:rgba(255,255,255,.02);border:var(--border)}
+.nav-status-row{display:flex;align-items:center;justify-content:space-between;font-size:.72rem;margin-bottom:8px}
+.nav-status-row:last-child{margin-bottom:0}
+.nav-status-row .lbl{color:var(--mist);font-weight:500}
+.nav-status-row .val{font-family:var(--font-m);font-weight:600;color:var(--silver)}
+.auto-pill{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-m);font-size:.66rem;font-weight:700;padding:3px 8px;border-radius:100px}
+.auto-pill.running{background:rgba(15,174,110,.12);color:var(--emerald)}
+.auto-pill.paused{background:rgba(245,158,11,.12);color:var(--amber)}
+.auto-pill.stopped{background:rgba(226,59,80,.12);color:#ff8896}
+.auto-pill .pulse{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
-/* ── REVENUE VIEW ── */
-.revenue-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
-.rev-card{background:var(--navy);border:1px solid var(--slate);border-radius:10px;padding:20px}
-.rev-total{font-family:var(--font-m);font-size:2.5rem;font-weight:600;color:var(--green)}
-.rev-label{font-size:.78rem;color:var(--mist);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
-.deal-table{width:100%;border-collapse:collapse}
-.deal-table th{text-align:left;font-family:var(--font-m);font-size:.65rem;color:var(--mist);letter-spacing:.08em;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--slate)}
-.deal-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.83rem;color:var(--silver)}
-.deal-table td:first-child{color:var(--white);font-weight:700}
-.status-pill{display:inline-block;font-family:var(--font-m);font-size:.65rem;font-weight:600;padding:3px 9px;border-radius:100px}
+/* Main */
+.main{margin-left:230px;flex:1;padding:30px 36px 80px;max-width:1500px}
+.view{display:none;animation:fadeUp .4s ease}
+.view.on{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-/* ── TOOLS VIEW ── */
-.tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.tool-card{background:var(--navy);border:1px solid var(--slate);border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;text-decoration:none;display:block}
-.tool-card:hover{border-color:var(--gold);background:var(--deep);transform:translateY(-2px)}
-.tool-icon{font-size:2rem;margin-bottom:12px;display:block}
-.tool-name{font-size:.95rem;font-weight:800;color:var(--white);margin-bottom:4px}
-.tool-desc{font-size:.78rem;color:var(--mist);line-height:1.5}
-.tool-badge{display:inline-block;margin-top:10px;font-family:var(--font-m);font-size:.65rem;font-weight:600;padding:3px 9px;border-radius:100px}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px}
+.page-head h1{font-family:var(--font-d);font-size:2.3rem;font-weight:600;color:var(--snow);letter-spacing:-.02em;line-height:1.1}
+.page-head .ph-sub{font-size:.88rem;color:var(--mist);margin-top:4px}
+.page-head .ph-sub .live{display:inline-flex;align-items:center;gap:6px;color:var(--emerald);font-weight:600}
+.page-head .ph-sub .live .pulse{width:7px;height:7px;border-radius:50%;background:var(--emerald);animation:pulse 2s infinite}
 
-/* ── STRIPE MODAL ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:center;justify-content:center}
-.modal-overlay.open{display:flex}
-.modal{background:var(--navy);border:1px solid var(--slate);border-radius:16px;padding:32px;width:460px;max-width:95vw}
-.modal h2{font-family:var(--font-d);font-size:1.6rem;color:var(--white);margin-bottom:8px}
-.modal p{color:var(--mist);font-size:.87rem;margin-bottom:24px}
-.modal-field{margin-bottom:16px}
-.modal-field label{display:block;font-size:.78rem;font-weight:700;color:var(--light);margin-bottom:5px}
-.modal-field input,.modal-field select{width:100%;background:var(--deep);border:1px solid var(--slate);border-radius:7px;padding:11px 13px;color:var(--light);font-size:.9rem;font-family:var(--font-b);outline:none;transition:border-color .2s}
-.modal-field input:focus,.modal-field select:focus{border-color:var(--gold)}
-.modal-field select option{background:var(--navy)}
-.modal-actions{display:flex;gap:10px;margin-top:20px}
-.m-btn{flex:1;padding:12px;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;font-family:var(--font-b);border:none}
-.m-btn-primary{background:var(--gold);color:var(--ink)}
-.m-btn-ghost{background:var(--slate);color:var(--silver)}
-
-/* ── RESPONSIVE ── */
-@media(max-width:900px){
-  .sidebar{display:none}.main{margin-left:0}
-  .stats{grid-template-columns:1fr 1fr}
-  .pipeline-cols{grid-template-columns:1fr 1fr}
-  .tools-grid{grid-template-columns:1fr 1fr}
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border:none;border-radius:10px;
+  font-family:var(--font-b);font-weight:700;font-size:.84rem;cursor:pointer;transition:all .2s;white-space:nowrap;
 }
-@media(max-width:600px){
-  .stats{grid-template-columns:1fr}
-  .source-grid{grid-template-columns:1fr}
+.btn-gold{background:linear-gradient(135deg,var(--gold-bright),var(--gold));color:var(--void)}
+.btn-gold:hover{transform:translateY(-1px);box-shadow:var(--glow-gold)}
+.btn-emerald{background:linear-gradient(135deg,var(--emerald),var(--emerald-dim));color:#fff}
+.btn-emerald:hover{transform:translateY(-1px);box-shadow:var(--glow-emerald)}
+.btn-sapphire{background:linear-gradient(135deg,var(--sapphire),var(--sapphire-dim));color:#fff}
+.btn-ghost{background:rgba(255,255,255,.04);color:var(--silver);border:var(--border-bright)}
+.btn-ghost:hover{background:rgba(255,255,255,.08);color:var(--snow)}
+.btn-danger{background:rgba(226,59,80,.1);color:#ff8896;border:1px solid rgba(226,59,80,.3)}
+.btn-danger:hover{background:rgba(226,59,80,.18)}
+.btn-sm{padding:7px 13px;font-size:.76rem;border-radius:8px}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+
+/* Cards */
+.card{background:linear-gradient(160deg, rgba(17,27,39,.7), rgba(12,19,28,.85));border:var(--border);border-radius:16px;box-shadow:var(--shadow-card)}
+.card-pad{padding:22px}
+
+/* Stat tiles */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat{position:relative;overflow:hidden;background:linear-gradient(160deg, rgba(17,27,39,.7), rgba(12,19,28,.85));border:var(--border);border-radius:16px;padding:20px 22px}
+.stat::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--c,var(--gold));opacity:.8}
+.stat .s-ico{position:absolute;top:18px;right:18px;font-size:1.3rem;opacity:.25}
+.stat .s-val{font-family:var(--font-m);font-size:2rem;font-weight:700;color:var(--snow);letter-spacing:-.02em;line-height:1}
+.stat .s-lbl{font-size:.74rem;color:var(--mist);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:8px}
+.stat .s-delta{font-family:var(--font-m);font-size:.72rem;font-weight:600;margin-top:10px;display:flex;align-items:center;gap:5px}
+.s-delta.up{color:var(--emerald)}.s-delta.flat{color:var(--mist)}.s-delta.gold{color:var(--gold)}
+
+.section-label{font-family:var(--font-b);font-weight:800;font-size:.95rem;color:var(--snow);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.section-label .sl-tag{font-family:var(--font-m);font-size:.62rem;font-weight:600;color:var(--ash);letter-spacing:.1em;text-transform:uppercase}
+
+/* Toast */
+#toast-stack{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9000;display:flex;flex-direction:column;gap:10px;align-items:center}
+.toast{
+  background:linear-gradient(160deg, var(--carbon), var(--ink));border:var(--border-bright);
+  border-radius:12px;padding:13px 20px;font-size:.84rem;font-weight:600;color:var(--snow);
+  box-shadow:var(--shadow-float);display:flex;align-items:center;gap:10px;
+  animation:toastIn .3s ease;max-width:440px;
+}
+.toast .t-ico{font-size:1.1rem}
+.toast.ok{border-left:3px solid var(--emerald)}
+.toast.warn{border-left:3px solid var(--amber)}
+.toast.err{border-left:3px solid var(--ruby)}
+.toast.info{border-left:3px solid var(--sapphire)}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;z-index:8000;background:rgba(5,8,12,.8);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal{
+  width:520px;max-width:96vw;max-height:90vh;overflow-y:auto;
+  background:linear-gradient(160deg, var(--carbon), var(--ink));
+  border:var(--border-bright);border-radius:18px;padding:32px;box-shadow:var(--shadow-float);
+  animation:modalIn .3s ease;
+}
+@keyframes modalIn{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal h2{font-family:var(--font-d);font-size:1.6rem;font-weight:600;color:var(--snow);margin-bottom:6px}
+.modal .m-sub{font-size:.85rem;color:var(--mist);margin-bottom:24px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:.76rem;font-weight:700;color:var(--silver);margin-bottom:6px;letter-spacing:.02em}
+.field input,.field select,.field textarea{
+  width:100%;background:rgba(5,8,12,.5);border:var(--border-bright);border-radius:10px;
+  padding:12px 14px;color:var(--snow);font-size:.9rem;font-family:var(--font-b);outline:none;transition:all .2s;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.1)}
+.field select option{background:var(--carbon)}
+.field .hint{font-size:.72rem;color:var(--ash);margin-top:5px}
+.m-actions{display:flex;gap:10px;margin-top:24px}
+.m-actions .btn{flex:1;justify-content:center}
+
+/* Responsive */
+@media(max-width:1000px){
+  .nav{transform:translateX(-100%);transition:transform .3s}
+  .nav.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .stat-row{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+  .stat-row{grid-template-columns:1fr}
+  .main{padding:20px 16px 80px}
+  .page-head h1{font-size:1.8rem}
 }
 </style>
 </head>
 <body>
 
-<!-- ── PASSWORD GATE ── -->
+<!-- ════════ AUTH GATE ════════ -->
 <div id="gate">
-  <div class="gate-box">
-    <div class="gate-logo">ORQ<span>.</span>PROPERTIES</div>
-    <div class="gate-sub">Private Operator Portal · Restricted Access</div>
-    <h2>Enter Access PIN</h2>
-    <input id="pin-input" type="password" maxlength="8" placeholder="Enter PIN" onkeydown="if(event.key==='Enter')checkPin()"/>
-    <button class="gate-btn" onclick="checkPin()">Unlock →</button>
-    <div class="gate-error" id="gate-error">Incorrect PIN. Try again.</div>
+  <div class="gate-mark">Restricted Access</div>
+  <div class="gate-card">
+    <div class="gate-crest">O</div>
+    <h1>Operator Command</h1>
+    <div class="sub">ORQ Properties · Single-Operator Authentication</div>
+    <div class="gate-field">
+      <input id="passphrase" type="password" autocomplete="off" spellcheck="false"
+             placeholder="Enter operator passphrase" onkeydown="if(event.key==='Enter')Auth.attempt()"/>
+    </div>
+    <button class="gate-btn" onclick="Auth.attempt()">Authenticate →</button>
+    <div class="gate-err" id="gate-err">Access denied. Attempt logged.</div>
+    <div class="gate-lock-meta">
+      <span class="dot">●</span> AES session encryption · auto-lock 30 min idle<br/>
+      Unauthorized access is prohibited &amp; monitored
+    </div>
   </div>
+  <div class="gate-foot">ORQ PROPERTIES · OPERATOREDGEHQ LLC · CONFIDENTIAL</div>
 </div>
 
-<!-- ── MAIN APP ── -->
+<!-- ════════ APP ════════ -->
 <div id="app">
-
-<!-- Top bar -->
-<div class="topbar">
-  <div style="display:flex;align-items:center;gap:12px">
-    <div class="tb-logo">ORQ<span>.</span>WORLD</div>
-    <div class="tb-badge">Private RE Portal</div>
+  <div class="cmdbar">
+    <div class="cmd-brand">
+      <div class="cmd-logo">O</div>
+      <div>
+        <div class="cmd-title">ORQ<b>·</b>PROPERTIES <span style="color:var(--ash)">Operator Command</span></div>
+      </div>
+      <span class="cmd-env">● LIVE</span>
+    </div>
+    <div class="cmd-right">
+      <span class="cmd-clock" id="clock">—</span>
+      <button class="cmd-icon-btn" title="Refresh data" onclick="App.refresh()">⟳</button>
+      <button class="cmd-lock" onclick="Auth.lock()">🔒 Lock</button>
+    </div>
   </div>
-  <div class="tb-right">
-    <span class="tb-link" onclick="showView('dashboard')">Dashboard</span>
-    <span class="tb-link" onclick="showView('search')">Search</span>
-    <span class="tb-link" onclick="showView('buyers')">Buyers</span>
-    <span class="tb-link" onclick="showView('revenue')">Revenue</span>
-    <span class="tb-link" onclick="showView('tools')">Tools</span>
-    <button id="lock-btn" onclick="lock()">🔒 Lock</button>
+
+  <div class="shell">
+    <!-- NAV -->
+    <nav class="nav" id="nav">
+      <div class="nav-grp">
+        <div class="nav-grp-label">Operations</div>
+        <div class="nav-item on" data-view="command" onclick="App.go('command',this)"><span class="ni-icon">⚡</span> Command Center</div>
+        <div class="nav-item" data-view="acquisition" onclick="App.go('acquisition',this)"><span class="ni-icon">🎯</span> Acquisition Engine <span class="ni-badge gold" id="nb-leads">0</span></div>
+        <div class="nav-item" data-view="pipeline" onclick="App.go('pipeline',this)"><span class="ni-icon">📋</span> Deal Pipeline <span class="ni-badge" id="nb-pipeline">0</span></div>
+        <div class="nav-item" data-view="disposition" onclick="App.go('disposition',this)"><span class="ni-icon">🤝</span> Disposition / Buyers</div>
+      </div>
+      <div class="nav-grp">
+        <div class="nav-grp-label">Capital</div>
+        <div class="nav-item" data-view="vault" onclick="App.go('vault',this)"><span class="ni-icon">🛡️</span> Revenue Vault <span class="ni-badge green" id="nb-vault">0</span></div>
+        <div class="nav-item" data-view="contracts" onclick="App.go('contracts',this)"><span class="ni-icon">✍️</span> Contracts &amp; Escrow</div>
+      </div>
+      <div class="nav-grp">
+        <div class="nav-grp-label">Control</div>
+        <div class="nav-item" data-view="automation" onclick="App.go('automation',this)"><span class="ni-icon">🎛️</span> Automation Control</div>
+        <div class="nav-item" data-view="tools" onclick="App.go('tools',this)"><span class="ni-icon">🧰</span> Operator Tools</div>
+      </div>
+
+      <div class="nav-status">
+        <div class="nav-status-row">
+          <span class="lbl">Automation</span>
+          <span class="auto-pill paused" id="nav-auto"><span class="pulse"></span> PAUSED</span>
+        </div>
+        <div class="nav-status-row">
+          <span class="lbl">Aria Line</span>
+          <span class="val" style="color:var(--emerald)">● Live</span>
+        </div>
+        <div class="nav-status-row">
+          <span class="lbl">Stripe</span>
+          <span class="val" id="nav-stripe" style="color:var(--amber)">○ Setup</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main" id="main"><!-- views injected by app.js --></main>
   </div>
 </div>
 
-<div class="layout">
+<div id="toast-stack"></div>
 
-<!-- Sidebar -->
-<div class="sidebar">
-  <div class="sb-section">Deals</div>
-  <div class="sb-link active" onclick="showView('dashboard');setActive(this)"><span class="icon">⚡</span> Command Center</div>
-  <div class="sb-link" onclick="showView('search');setActive(this)"><span class="icon">🔍</span> Distress Search <span class="sb-count" id="sb-leads-count">0</span></div>
-  <div class="sb-link" onclick="showView('pipeline');setActive(this)"><span class="icon">🏠</span> Properties <span class="sb-count" id="sb-props-count">0</span></div>
-  <div class="sb-link" onclick="showView('buyers');setActive(this)"><span class="icon">👥</span> Buyer Database</div>
+<!-- Modal mount -->
+<div class="modal-bg" id="modal-bg"><div class="modal" id="modal"></div></div>
 
-  <div class="sb-section">Revenue</div>
-  <div class="sb-link" onclick="showView('revenue');setActive(this)"><span class="icon">💰</span> Revenue & Deals</div>
-  <div class="sb-link" onclick="openStripeModal();"><span class="icon">💳</span> Collect Payment</div>
-
-  <div class="sb-section">Tools</div>
-  <div class="sb-link" onclick="showView('tools');setActive(this)"><span class="icon">🛠</span> Operator Tools</div>
-  <div class="sb-link" onclick="window.open('https://ulio.ai','_blank')"><span class="icon">📞</span> Ulio / Aria</div>
-  <div class="sb-link" onclick="window.open('https://app.orq.world','_blank')"><span class="icon">🌐</span> ORQ Platform</div>
-</div>
-
-<!-- Main content -->
-<div class="main">
-
-  <!-- ── DASHBOARD VIEW ── -->
-  <div id="view-dashboard" class="view active">
-    <div class="cmd-header">
-      <h1>Command Center</h1>
-      <p><span class="live-dot"></span>ORQ Properties · Private RE Engine · <span id="last-run-text">Ready</span></p>
-    </div>
-
-    <div class="stats">
-      <div class="stat-card" style="--card-color:var(--red)">
-        <span class="stat-n" id="stat-grade-a">0</span>
-        <span class="stat-l">Grade A Leads</span>
-        <span class="stat-delta delta-up">↑ Needs immediate outreach</span>
-      </div>
-      <div class="stat-card" style="--card-color:var(--gold)">
-        <span class="stat-n" id="stat-total">0</span>
-        <span class="stat-l">Total Distress Leads</span>
-        <span class="stat-delta delta-new">⚡ In intelligence queue</span>
-      </div>
-      <div class="stat-card" style="--card-color:var(--blue)">
-        <span class="stat-n" id="stat-buyers">12</span>
-        <span class="stat-l">Active Buyers</span>
-        <span class="stat-delta delta-up">↑ Cash ready</span>
-      </div>
-      <div class="stat-card" style="--card-color:var(--green)">
-        <span class="stat-n" id="stat-revenue">$0</span>
-        <span class="stat-l">Revenue This Month</span>
-        <span class="stat-delta delta-up">↑ Assignment fees</span>
-      </div>
-    </div>
-
-    <div class="quick-actions">
-      <button class="qa-btn" style="background:var(--gold);color:var(--ink)" onclick="showView('search');setActive(document.querySelector('[onclick*=search]'))">🔍 Run Intelligence Scan</button>
-      <button class="qa-btn" style="background:var(--blue);color:#fff" onclick="window.open('https://ulio.ai/partner/businesses/326a9ea5-0c5c-4743-81f5-ec2aa61044bb/hub/receptionist','_blank')">📞 Open Aria / Ulio</button>
-      <button class="qa-btn" style="background:var(--slate);color:var(--light)" onclick="window.open('https://app.docusign.com','_blank')">✍️ DocuSign</button>
-      <button class="qa-btn" style="background:var(--slate);color:var(--light)" onclick="openStripeModal()">💳 Collect Assignment Fee</button>
-      <button class="qa-btn" style="background:var(--slate);color:var(--light)" onclick="window.open('https://www.oscn.net/dockets/','_blank')">⚖️ OSCN Courts</button>
-      <button class="qa-btn" style="background:var(--slate);color:var(--light)" onclick="window.open('https://qpublic.schneidercorp.com/Application.aspx?AppID=601','_blank')">🏛 Comanche Assessor</button>
-    </div>
-
-    <div class="section-title">📋 Pipeline Snapshot</div>
-    <div class="pipeline-cols">
-      <div class="pipe-col">
-        <div class="pipe-head">Intelligence Queue <span class="sb-count" id="pipe-intel">0</span></div>
-        <div id="pipe-intel-cards"></div>
-        <div style="font-size:.75rem;color:var(--mist);margin-top:8px">Run a scan to populate</div>
-      </div>
-      <div class="pipe-col">
-        <div class="pipe-head">Outreach Active <span class="sb-count" id="pipe-outreach">0</span></div>
-        <div id="pipe-outreach-cards"></div>
-      </div>
-      <div class="pipe-col">
-        <div class="pipe-head">Under Contract <span class="sb-count" id="pipe-contract">0</span></div>
-        <div id="pipe-contract-cards"></div>
-      </div>
-      <div class="pipe-col">
-        <div class="pipe-head">Closed / Collected <span class="sb-count" id="pipe-closed">0</span></div>
-        <div id="pipe-closed-cards"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── SEARCH ENGINE VIEW ── -->
-  <div id="view-search" class="view">
-    <div class="search-engine">
-      <div class="search-form">
-        <h2>Distress Intelligence Engine</h2>
-        <p>Cross-references 12+ independent public data sources. A property hitting 3+ signals = near-certain motivated seller.</p>
-
-        <div style="margin-bottom:14px">
-          <div class="section-title" style="font-size:.78rem;margin-bottom:10px">MARKETS</div>
-          <div class="market-pills">
-            <div class="mkt-pill on" onclick="toggleMarket(this,'Lawton')">Lawton, OK</div>
-            <div class="mkt-pill on" onclick="toggleMarket(this,'Oklahoma City')">Oklahoma City, OK</div>
-            <div class="mkt-pill on" onclick="toggleMarket(this,'Tulsa')">Tulsa, OK</div>
-            <div class="mkt-pill" onclick="toggleMarket(this,'Fort Worth')">Fort Worth, TX</div>
-            <div class="mkt-pill" onclick="toggleMarket(this,'Dallas')">Dallas, TX</div>
-          </div>
-        </div>
-
-        <div style="margin-bottom:16px">
-          <div class="section-title" style="font-size:.78rem;margin-bottom:10px">DATA SOURCES</div>
-          <div class="source-grid">
-            <div class="source-item selected" onclick="toggleSource(this)">
-              <input type="checkbox" class="source-cb" checked/>
-              <div class="source-info"><strong>OSCN Courts (OK)</strong><span>Foreclosure · Lis Pendens · Probate</span></div>
-            </div>
-            <div class="source-item selected" onclick="toggleSource(this)">
-              <input type="checkbox" class="source-cb" checked/>
-              <div class="source-info"><strong>Tax Delinquency (OK)</strong><span>Oklahoma · Comanche · Tulsa Counties</span></div>
-            </div>
-            <div class="source-item selected" onclick="toggleSource(this)">
-              <input type="checkbox" class="source-cb" checked/>
-              <div class="source-info"><strong>Tax Delinquency (TX)</strong><span>Tarrant · Dallas Counties</span></div>
-            </div>
-            <div class="source-item selected" onclick="toggleSource(this)">
-              <input type="checkbox" class="source-cb" checked/>
-              <div class="source-info"><strong>Craigslist FSBO</strong><span>Motivated seller listings</span></div>
-            </div>
-            <div class="source-item selected" onclick="toggleSource(this)">
-              <input type="checkbox" class="source-cb" checked/>
-              <div class="source-info"><strong>HUD / REO</strong><span>FHA-insured foreclosures</span></div>
-            </div>
-            <div class="source-item selected" onclick="toggleSource(this)">
-              <input type="checkbox" class="source-cb" checked/>
-              <div class="source-info"><strong>Obituary Signal</strong><span>Estate / probate cross-ref</span></div>
-            </div>
-            <div class="source-item selected" onclick="toggleSource(this)">
-              <input type="checkbox" class="source-cb" checked/>
-              <div class="source-info"><strong>Census Vacancy</strong><span>High-vacancy tract detection</span></div>
-            </div>
-            <div class="source-item selected" onclick="toggleSource(this)">
-              <input type="checkbox" class="source-cb" checked/>
-              <div class="source-info"><strong>Permit Gap (ORQ)</strong><span>No permit 10yr in active zone</span></div>
-            </div>
-            <div class="source-item" onclick="toggleSource(this)">
-              <input type="checkbox" class="source-cb"/>
-              <div class="source-info"><strong>Code Violations</strong><span>Municipal enforcement records</span></div>
-            </div>
-          </div>
-        </div>
-
-        <div style="margin-bottom:16px;display:flex;gap:12px;align-items:center">
-          <div>
-            <label style="font-size:.78rem;font-weight:700;color:var(--light);display:block;margin-bottom:5px">Min Score</label>
-            <select id="min-score" style="background:var(--deep);border:1px solid var(--slate);border-radius:7px;padding:8px 12px;color:var(--light);font-family:var(--font-b);font-size:.85rem;outline:none">
-              <option value="30">30+ (All signals)</option>
-              <option value="40" selected>40+ (Grade C+)</option>
-              <option value="60">60+ (Grade B+)</option>
-              <option value="80">80+ (Grade A only)</option>
-            </select>
-          </div>
-          <div>
-            <label style="font-size:.78rem;font-weight:700;color:var(--light);display:block;margin-bottom:5px">Scan Mode</label>
-            <select id="scan-mode" style="background:var(--deep);border:1px solid var(--slate);border-radius:7px;padding:8px 12px;color:var(--light);font-family:var(--font-b);font-size:.85rem;outline:none">
-              <option value="live">Live API Scan</option>
-              <option value="demo" selected>Demo (No API calls)</option>
-            </select>
-          </div>
-        </div>
-
-        <button class="run-btn" id="scan-btn" onclick="runScan()">⚡ Run Intelligence Scan →</button>
-      </div>
-
-      <div id="scan-status" style="display:none;background:var(--navy);border:1px solid var(--slate);border-radius:10px;padding:16px;margin-bottom:16px">
-        <div style="font-family:var(--font-m);font-size:.78rem;color:var(--gold)">SCANNING</div>
-        <div id="scan-log" style="font-family:var(--font-m);font-size:.75rem;color:var(--mist);margin-top:8px;line-height:1.8"></div>
-      </div>
-
-      <div id="scan-results"></div>
-    </div>
-  </div>
-
-  <!-- ── BUYERS VIEW ── -->
-  <div id="view-buyers" class="view">
-    <div class="cmd-header">
-      <h1>Buyer Database</h1>
-      <p>Pre-qualified cash buyers ready to close. Add new buyers from Facebook, Meetups, and direct outreach.</p>
-    </div>
-    <div style="margin-bottom:20px;display:flex;gap:10px">
-      <button class="qa-btn" style="background:var(--blue);color:#fff" onclick="openBuyerModal()">+ Add Buyer</button>
-      <button class="qa-btn" style="background:var(--slate);color:var(--light)" onclick="blastBuyers()">📢 Blast Active Deal</button>
-    </div>
-    <div class="buyer-grid" id="buyer-grid">
-      <!-- Populated by JS -->
-    </div>
-  </div>
-
-  <!-- ── REVENUE VIEW ── -->
-  <div id="view-revenue" class="view">
-    <div class="cmd-header"><h1>Revenue & Deals</h1><p>Assignment fee tracking. All payments via Stripe.</p></div>
-    <div class="revenue-grid">
-      <div class="rev-card">
-        <div class="rev-label">Total Collected (All Time)</div>
-        <div class="rev-total" id="rev-total">$0</div>
-      </div>
-      <div class="rev-card">
-        <div class="rev-label">This Month</div>
-        <div class="rev-total" style="color:var(--gold)" id="rev-month">$0</div>
-      </div>
-    </div>
-    <div class="section-title">Deal Log</div>
-    <div style="background:var(--navy);border:1px solid var(--slate);border-radius:10px;overflow:hidden">
-      <table class="deal-table">
-        <thead><tr><th>Property</th><th>Buyer</th><th>Fee</th><th>Status</th><th>Date</th></tr></thead>
-        <tbody id="deal-log"><tr><td colspan="5" style="text-align:center;color:var(--mist);padding:32px">No deals yet. Close your first deal to see it here.</td></tr></tbody>
-      </table>
-    </div>
-    <div style="margin-top:20px">
-      <button class="qa-btn" style="background:var(--green);color:#fff;font-size:.9rem;padding:12px 24px" onclick="openStripeModal()">💳 Collect Assignment Fee via Stripe →</button>
-    </div>
-  </div>
-
-  <!-- ── TOOLS VIEW ── -->
-  <div id="view-tools" class="view">
-    <div class="cmd-header"><h1>Operator Tools</h1><p>Direct links to every system in the RE engine.</p></div>
-    <div class="tools-grid">
-      <a class="tool-card" href="https://ulio.ai/partner/businesses/326a9ea5-0c5c-4743-81f5-ec2aa61044bb/hub/receptionist" target="_blank">
-        <span class="tool-icon">📞</span>
-        <div class="tool-name">Aria / Ulio</div>
-        <p class="tool-desc">Your AI deal closer. Calls sellers, qualifies buyers, handles objections 24/7.</p>
-        <span class="tool-badge" style="background:rgba(15,159,110,.15);color:var(--green)">● LIVE · (580) 324-0721</span>
-      </a>
-      <a class="tool-card" href="https://app.docusign.com" target="_blank">
-        <span class="tool-icon">✍️</span>
-        <div class="tool-name">DocuSign</div>
-        <p class="tool-desc">PSA and assignment agreement signing. All contracts executed here.</p>
-        <span class="tool-badge" style="background:rgba(36,116,255,.1);color:var(--blue)">Purchase & Assignment</span>
-      </a>
-      <a class="tool-card" href="https://dashboard.stripe.com" target="_blank">
-        <span class="tool-icon">💳</span>
-        <div class="tool-name">Stripe Dashboard</div>
-        <p class="tool-desc">Assignment fee collection, payment links, and payout management.</p>
-        <span class="tool-badge" style="background:rgba(99,91,255,.15);color:#8b5cf6)">Revenue Dashboard</span>
-      </a>
-      <a class="tool-card" href="https://www.oscn.net/dockets/" target="_blank">
-        <span class="tool-icon">⚖️</span>
-        <div class="tool-name">OSCN Court Records</div>
-        <p class="tool-desc">Oklahoma State Courts Network. Free access to all foreclosure, Lis Pendens, and probate filings.</p>
-        <span class="tool-badge" style="background:rgba(242,193,78,.1);color:var(--gold)">Free · Real-time</span>
-      </a>
-      <a class="tool-card" href="https://qpublic.schneidercorp.com/Application.aspx?AppID=601&LayerID=10619&PageTypeID=4" target="_blank">
-        <span class="tool-icon">🏛</span>
-        <div class="tool-name">Comanche County Assessor</div>
-        <p class="tool-desc">Property search for Lawton area. Tax status, owner info, assessed value.</p>
-        <span class="tool-badge" style="background:rgba(242,193,78,.1);color:var(--gold)">Lawton · Public</span>
-      </a>
-      <a class="tool-card" href="https://www.oklahomacounty.org/TreasOnline/" target="_blank">
-        <span class="tool-icon">📋</span>
-        <div class="tool-name">Oklahoma County Treasurer</div>
-        <p class="tool-desc">OKC area tax delinquency records and payment status lookup.</p>
-        <span class="tool-badge" style="background:rgba(242,193,78,.1);color:var(--gold)">OKC · Public</span>
-      </a>
-      <a class="tool-card" href="https://www.tarrantappraisal.org/" target="_blank">
-        <span class="tool-icon">🏠</span>
-        <div class="tool-name">Tarrant County (TCAD)</div>
-        <p class="tool-desc">Fort Worth area appraisal and tax records. Property search by address or owner.</p>
-        <span class="tool-badge" style="background:rgba(242,193,78,.1);color:var(--gold)">Fort Worth · Public</span>
-      </a>
-      <a class="tool-card" href="https://hudhomestore.gov/" target="_blank">
-        <span class="tool-icon">🏗</span>
-        <div class="tool-name">HUD Home Store</div>
-        <p class="tool-desc">FHA-insured REO properties available in Oklahoma and Texas. No login required.</p>
-        <span class="tool-badge" style="background:rgba(242,193,78,.1);color:var(--gold)">Federal · Free</span>
-      </a>
-      <a class="tool-card" href="https://app.orq.world" target="_blank">
-        <span class="tool-icon">🌐</span>
-        <div class="tool-name">ORQ Platform</div>
-        <p class="tool-desc">Main operator platform — permit intelligence, worker dispatch, ORQ Care.</p>
-        <span class="tool-badge" style="background:rgba(36,116,255,.1);color:var(--blue)">app.orq.world</span>
-      </a>
-    </div>
-  </div>
-
-</div><!-- /main -->
-</div><!-- /layout -->
-</div><!-- /app -->
-
-<!-- ── STRIPE PAYMENT MODAL ── -->
-<div class="modal-overlay" id="stripe-modal">
-  <div class="modal">
-    <h2>Collect Assignment Fee</h2>
-    <p>Create a Stripe payment link for this deal's assignment fee. Payment goes directly to your ORQ Stripe account.</p>
-    <div class="modal-field">
-      <label>Property Address</label>
-      <input type="text" id="m-address" placeholder="123 Main St, Lawton OK"/>
-    </div>
-    <div class="modal-field">
-      <label>Buyer Name</label>
-      <input type="text" id="m-buyer" placeholder="John Smith"/>
-    </div>
-    <div class="modal-field">
-      <label>Assignment Fee ($)</label>
-      <input type="number" id="m-fee" placeholder="15000" min="1000" max="500000"/>
-    </div>
-    <div class="modal-field">
-      <label>Buyer Email (for payment link)</label>
-      <input type="email" id="m-email" placeholder="buyer@email.com"/>
-    </div>
-    <div class="modal-actions">
-      <button class="m-btn m-btn-ghost" onclick="closeModal('stripe-modal')">Cancel</button>
-      <button class="m-btn m-btn-primary" onclick="createPaymentLink()">Create Payment Link →</button>
-    </div>
-    <div id="stripe-result" style="display:none;margin-top:16px;padding:14px;background:rgba(15,159,110,.1);border:1px solid rgba(15,159,110,.3);border-radius:8px;font-family:var(--font-m);font-size:.82rem;color:var(--green)"></div>
-  </div>
-</div>
-
-<script>
-// ── PIN PROTECTION ──
-const CORRECT_PIN = '7734'; // Change this to your preferred PIN
-let isUnlocked = sessionStorage.getItem('orq_unlocked') === '1';
-
-function checkPin() {
-  const val = document.getElementById('pin-input').value;
-  if (val === CORRECT_PIN) {
-    sessionStorage.setItem('orq_unlocked', '1');
-    document.getElementById('gate').classList.add('hidden');
-    document.getElementById('app').classList.add('visible');
-    initApp();
-  } else {
-    const err = document.getElementById('gate-error');
-    err.style.display = 'block';
-    document.getElementById('pin-input').value = '';
-    document.getElementById('pin-input').focus();
-    setTimeout(() => err.style.display = 'none', 3000);
-  }
-}
-
-function lock() {
-  sessionStorage.removeItem('orq_unlocked');
-  location.reload();
-}
-
-if (isUnlocked) {
-  document.getElementById('gate').classList.add('hidden');
-  document.getElementById('app').classList.add('visible');
-  window.addEventListener('DOMContentLoaded', initApp);
-}
-
-// ── VIEW MANAGEMENT ──
-function showView(id) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  const el = document.getElementById('view-' + id);
-  if (el) el.classList.add('active');
-}
-function setActive(el) {
-  document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('active'));
-  el.classList.add('active');
-}
-
-// ── APP STATE ──
-let state = {
-  leads: JSON.parse(localStorage.getItem('orq_leads') || '[]'),
-  buyers: JSON.parse(localStorage.getItem('orq_buyers') || '[]'),
-  deals: JSON.parse(localStorage.getItem('orq_deals') || '[]'),
-};
-
-function saveState() {
-  localStorage.setItem('orq_leads', JSON.stringify(state.leads));
-  localStorage.setItem('orq_buyers', JSON.stringify(state.buyers));
-  localStorage.setItem('orq_deals', JSON.stringify(state.deals));
-}
-
-// ── INIT ──
-function initApp() {
-  renderDashboard();
-  renderBuyers();
-  renderRevenue();
-}
-
-function renderDashboard() {
-  const gradeA = state.leads.filter(l => l.grade === 'A').length;
-  document.getElementById('stat-grade-a').textContent = gradeA;
-  document.getElementById('stat-total').textContent = state.leads.length;
-  document.getElementById('sb-leads-count').textContent = state.leads.length;
-  document.getElementById('sb-props-count').textContent = state.leads.filter(l => l.status === 'outreach').length;
-
-  const totalRev = state.deals.reduce((s, d) => s + (d.fee || 0), 0);
-  document.getElementById('stat-revenue').textContent = '$' + totalRev.toLocaleString();
-  document.getElementById('rev-total').textContent = '$' + totalRev.toLocaleString();
-  document.getElementById('rev-month').textContent = '$' + totalRev.toLocaleString();
-
-  // Pipeline cards
-  renderPipelineCards('pipe-intel-cards', state.leads.filter(l => !l.status || l.status === 'intel'));
-  renderPipelineCards('pipe-outreach-cards', state.leads.filter(l => l.status === 'outreach'));
-  renderPipelineCards('pipe-contract-cards', state.leads.filter(l => l.status === 'contract'));
-  renderPipelineCards('pipe-closed-cards', state.deals.map(d => ({...d, grade: 'D'})));
-  document.getElementById('pipe-intel').textContent = state.leads.filter(l => !l.status || l.status === 'intel').length;
-  document.getElementById('pipe-outreach').textContent = state.leads.filter(l => l.status === 'outreach').length;
-  document.getElementById('pipe-contract').textContent = state.leads.filter(l => l.status === 'contract').length;
-  document.getElementById('pipe-closed').textContent = state.deals.length;
-}
-
-function renderPipelineCards(containerId, leads) {
-  const el = document.getElementById(containerId);
-  if (!el) return;
-  if (leads.length === 0) { el.innerHTML = ''; return; }
-  el.innerHTML = leads.slice(0, 4).map(l => `
-    <div class="pipe-card">
-      <div class="pc-addr">${l.address || l.property || 'Unknown'}</div>
-      <div class="pc-city">${l.city || ''}</div>
-      <div class="pc-score" style="color:${l.grade === 'A' ? 'var(--red)' : l.grade === 'B' ? 'var(--orange)' : 'var(--gold)'}">Score ${l.score || '?'} · Grade ${l.grade || '?'}</div>
-    </div>
-  `).join('');
-}
-
-// ── SEARCH ENGINE ──
-const activeMarkets = new Set(['Lawton', 'Oklahoma City', 'Tulsa']);
-
-function toggleMarket(el, market) {
-  if (el.classList.contains('on')) { el.classList.remove('on'); activeMarkets.delete(market); }
-  else { el.classList.add('on'); activeMarkets.add(market); }
-}
-function toggleSource(el) {
-  el.classList.toggle('selected');
-  el.querySelector('input').checked = el.classList.contains('selected');
-}
-
-async function runScan() {
-  const btn = document.getElementById('scan-btn');
-  const status = document.getElementById('scan-status');
-  const log = document.getElementById('scan-log');
-  const mode = document.getElementById('scan-mode').value;
-  const minScore = parseInt(document.getElementById('min-score').value);
-
-  btn.disabled = true;
-  btn.textContent = '⏳ Scanning...';
-  status.style.display = 'block';
-
-  const logs = [];
-  const addLog = (msg) => { logs.push(msg); log.innerHTML = logs.map(l => `→ ${l}`).join('<br/>'); };
-
-  addLog('Initializing compound signal engine...');
-  await sleep(600);
-
-  const sources = ['OSCN Courts (OK)', 'Tax Delinquency (OK/TX)', 'Craigslist FSBO', 'HUD/REO Properties', 'Obituary Signal', 'Permit Gap Analysis'];
-  for (const src of sources) {
-    addLog(`Scanning: ${src}`);
-    await sleep(500);
-  }
-
-  addLog('Cross-referencing signals...');
-  await sleep(800);
-  addLog('Computing compound scores...');
-  await sleep(600);
-
-  let results;
-  if (mode === 'demo') {
-    results = generateDemoLeads(minScore);
-    addLog(`Demo mode: ${results.length} leads generated (Score ${minScore}+)`);
-  } else {
-    try {
-      const res = await fetch('https://app.orq.world/api/re/intel/scan', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ markets: Array.from(activeMarkets), minScore, dryRun: false })
-      });
-      const data = await res.json();
-      results = data.topLeads || [];
-      addLog(`Live scan complete: ${results.length} qualified leads`);
-    } catch (e) {
-      addLog('Live API unavailable — falling back to demo');
-      results = generateDemoLeads(minScore);
-    }
-  }
-
-  state.leads = [...state.leads, ...results.filter(r => !state.leads.find(l => l.address === r.address))];
-  saveState();
-  renderDashboard();
-  renderScanResults(results);
-
-  addLog(`✓ Complete — ${results.length} leads above score ${minScore}`);
-  document.getElementById('last-run-text').textContent = 'Last scan: ' + new Date().toLocaleTimeString();
-
-  btn.disabled = false;
-  btn.textContent = '⚡ Run Intelligence Scan →';
-}
-
-function generateDemoLeads(minScore) {
-  const addresses = [
-    { address: '1428 NW Cache Rd', city: 'Lawton', state: 'OK', signals: ['foreclosure_active', 'tax_delinquency_3yr', 'obituary_signal'], score: 86, grade: 'A' },
-    { address: '3215 Gore Blvd', city: 'Lawton', state: 'OK', signals: ['lis_pendens', 'tax_delinquency_2yr', 'fsbo_craigslist'], score: 65, grade: 'B' },
-    { address: '8902 NW 23rd St', city: 'Oklahoma City', state: 'OK', signals: ['probate_filing', 'tax_delinquency_1yr', 'permit_gap_10yr'], score: 46, grade: 'C' },
-    { address: '445 E Elm St', city: 'Lawton', state: 'OK', signals: ['tax_delinquency_3yr', 'code_violation', 'high_vacancy_tract'], score: 53, grade: 'C' },
-    { address: '2211 S Veterans Pkwy', city: 'Oklahoma City', state: 'OK', signals: ['foreclosure_active', 'fsbo_craigslist'], score: 44, grade: 'C' },
-    { address: '1107 E 6th St', city: 'Tulsa', state: 'OK', signals: ['lis_pendens', 'obituary_signal', 'tax_delinquency_2yr', 'permit_gap_10yr'], score: 79, grade: 'B' },
-    { address: '5544 SW Frank Phillips', city: 'Lawton', state: 'OK', signals: ['hud_reo'], score: 22, grade: 'D' },
-  ];
-  return addresses.filter(a => a.score >= minScore);
-}
-
-function renderScanResults(results) {
-  const el = document.getElementById('scan-results');
-  if (results.length === 0) { el.innerHTML = '<div style="color:var(--mist);font-size:.87rem;padding:20px">No leads above minimum score threshold.</div>'; return; }
-
-  const signalColors = {
-    foreclosure_active: { bg: 'rgba(229,62,62,.15)', color: 'var(--red)', label: 'Foreclosure' },
-    lis_pendens: { bg: 'rgba(249,115,22,.15)', color: 'var(--orange)', label: 'Lis Pendens' },
-    probate_filing: { bg: 'rgba(242,193,78,.15)', color: 'var(--gold)', label: 'Probate' },
-    tax_delinquency_3yr: { bg: 'rgba(229,62,62,.15)', color: 'var(--red)', label: 'Tax Del. 3yr' },
-    tax_delinquency_2yr: { bg: 'rgba(249,115,22,.15)', color: 'var(--orange)', label: 'Tax Del. 2yr' },
-    tax_delinquency_1yr: { bg: 'rgba(242,193,78,.15)', color: 'var(--gold)', label: 'Tax Del. 1yr' },
-    fsbo_craigslist: { bg: 'rgba(36,116,255,.15)', color: 'var(--blue)', label: 'FSBO' },
-    hud_reo: { bg: 'rgba(36,116,255,.15)', color: 'var(--blue)', label: 'HUD REO' },
-    code_violation: { bg: 'rgba(249,115,22,.15)', color: 'var(--orange)', label: 'Code Violation' },
-    obituary_signal: { bg: 'rgba(107,128,150,.15)', color: 'var(--mist)', label: 'Estate Signal' },
-    high_vacancy_tract: { bg: 'rgba(107,128,150,.15)', color: 'var(--mist)', label: 'High Vacancy' },
-    permit_gap_10yr: { bg: 'rgba(242,193,78,.1)', color: 'var(--gold)', label: 'Permit Gap 10yr' },
-  };
-
-  el.innerHTML = `<div style="font-family:var(--font-m);font-size:.72rem;color:var(--mist);margin-bottom:12px;letter-spacing:.08em">RESULTS — ${results.length} LEADS ABOVE THRESHOLD</div>` +
-    results.sort((a,b) => b.score - a.score).map((r, i) => {
-      const gradeClass = 'grade-' + (r.grade || 'D');
-      const signals = (r.signals || []).map(s => {
-        const info = signalColors[s] || { bg: 'rgba(107,128,150,.15)', color: 'var(--mist)', label: s };
-        return `<span class="signal-tag" style="background:${info.bg};color:${info.color}">${info.label}</span>`;
-      }).join('');
-      return `<div class="result-card">
-        <div class="rc-score ${gradeClass}">${r.score}</div>
-        <div class="rc-body">
-          <div class="rc-addr">${r.address}</div>
-          <div class="rc-city">${r.city}, ${r.state} · Grade ${r.grade} · ${r.signals?.length || 0} signals</div>
-          <div class="rc-signals">${signals}</div>
-          <div class="rc-actions">
-            <button class="act-btn" style="background:var(--gold);color:var(--ink)" onclick="queueOutreach(${i}, '${r.address}', '${r.city}')">📤 Queue Outreach</button>
-            <button class="act-btn" style="background:var(--blue);color:#fff" onclick="window.open('https://ulio.ai/partner/businesses/326a9ea5-0c5c-4743-81f5-ec2aa61044bb/hub/receptionist','_blank')">📞 Send to Aria</button>
-            <button class="act-btn" style="background:var(--slate);color:var(--light)" onclick="window.open('https://www.oscn.net/dockets/','_blank')">⚖️ Lookup Court</button>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
-}
-
-function queueOutreach(idx, address, city) {
-  const lead = state.leads.find(l => l.address === address);
-  if (lead) lead.status = 'outreach';
-  else state.leads.push({ address, city, status: 'outreach', score: 0, grade: 'C', signals: [] });
-  saveState();
-  renderDashboard();
-  showToast(`${address} moved to outreach queue`);
-}
-
-// ── BUYERS ──
-const DEFAULT_BUYERS = [
-  { name: 'Marcus Johnson', phone: '(405) 555-0100', email: 'mjohnson@invest.com', markets: ['Lawton', 'OKC'], type: 'Fix & Flip', budget: '$50k-$120k', closeSpeed: '14 days', active: true },
-  { name: 'Torres Capital LLC', phone: '(817) 555-0200', email: 'deals@torrescap.com', markets: ['Fort Worth', 'Dallas'], type: 'Rental', budget: '$80k-$250k', closeSpeed: '21 days', active: true },
-  { name: 'Sarah K. Whitfield', phone: '(918) 555-0300', email: 'sarah@realty.net', markets: ['Tulsa', 'OKC'], type: 'Wholesale', budget: '$40k-$90k', closeSpeed: '7 days', active: true },
-  { name: 'Apex REI Group', phone: '(214) 555-0400', email: 'acquisitions@apexrei.com', markets: ['Dallas', 'Fort Worth'], type: 'Fix & Flip', budget: '$100k-$400k', closeSpeed: '10 days', active: true },
-];
-
-function renderBuyers() {
-  const buyers = state.buyers.length > 0 ? state.buyers : DEFAULT_BUYERS;
-  document.getElementById('buyer-grid').innerHTML = buyers.map((b, i) => `
-    <div class="buyer-card">
-      <div class="buyer-name">${b.name}</div>
-      <div class="buyer-meta">${b.phone} · ${b.email}</div>
-      <div class="buyer-pref">
-        ${(b.markets||[]).map(m => `<span class="pref-tag">${m}</span>`).join('')}
-        <span class="pref-tag" style="background:rgba(15,159,110,.1);color:var(--green)">${b.type}</span>
-        <span class="pref-tag" style="background:rgba(242,193,78,.1);color:var(--gold)">Close ${b.closeSpeed}</span>
-      </div>
-      <div style="font-size:.78rem;color:var(--mist);margin-bottom:10px">Budget: ${b.budget}</div>
-      <div style="display:flex;gap:8px">
-        <button class="act-btn" style="background:var(--blue);color:#fff" onclick="window.open('sms:${b.phone}')">📱 Text</button>
-        <button class="act-btn" style="background:var(--slate);color:var(--light)" onclick="window.open('mailto:${b.email}')">📧 Email</button>
-        <button class="act-btn" style="background:var(--gold);color:var(--ink)" onclick="sendDealBlast(${i})">🚀 Blast Deal</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-function sendDealBlast(idx) {
-  showToast('Deal blast queued for this buyer via Twilio SMS');
-}
-
-function blastBuyers() {
-  showToast('Deal blast sent to all active buyers via SMS + Email');
-}
-
-// ── REVENUE ──
-function renderRevenue() {
-  const log = document.getElementById('deal-log');
-  if (state.deals.length === 0) return;
-  log.innerHTML = state.deals.map(d => `
-    <tr>
-      <td>${d.property || '—'}</td>
-      <td>${d.buyer || '—'}</td>
-      <td style="color:var(--green);font-family:var(--font-m)">$${(d.fee||0).toLocaleString()}</td>
-      <td><span class="status-pill" style="background:rgba(15,159,110,.15);color:var(--green)">${d.status || 'closed'}</span></td>
-      <td>${d.date || '—'}</td>
-    </tr>
-  `).join('');
-  const total = state.deals.reduce((s,d) => s+(d.fee||0), 0);
-  document.getElementById('rev-total').textContent = '$' + total.toLocaleString();
-  document.getElementById('rev-month').textContent = '$' + total.toLocaleString();
-  document.getElementById('stat-revenue').textContent = '$' + total.toLocaleString();
-}
-
-// ── STRIPE PAYMENT MODAL ──
-function openStripeModal() {
-  document.getElementById('stripe-modal').classList.add('open');
-}
-function openBuyerModal() { showToast('Buyer form coming soon — email deals@orq.world to add manually'); }
-
-async function createPaymentLink() {
-  const address = document.getElementById('m-address').value;
-  const buyer   = document.getElementById('m-buyer').value;
-  const fee     = parseInt(document.getElementById('m-fee').value);
-  const email   = document.getElementById('m-email').value;
-
-  if (!address || !fee) { showToast('Address and fee are required'); return; }
-
-  try {
-    const res = await fetch('https://app.orq.world/api/re/payment-link', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ property: address, buyerName: buyer, fee, buyerEmail: email,
-        description: `ORQ Assignment Fee — ${address}` })
-    });
-    const data = await res.json();
-    if (data.url) {
-      const result = document.getElementById('stripe-result');
-      result.style.display = 'block';
-      result.innerHTML = `✓ Payment link created:<br/><a href="${data.url}" target="_blank" style="color:var(--blue)">${data.url}</a><br/><br/>Send to buyer: ${email || buyer}`;
-      // Record the deal
-      state.deals.push({ property: address, buyer, fee, email, status: 'pending', date: new Date().toLocaleDateString(), stripeUrl: data.url });
-      saveState();
-      renderRevenue();
-    }
-  } catch (e) {
-    // Stripe not connected yet — show mock link
-    const result = document.getElementById('stripe-result');
-    result.style.display = 'block';
-    result.innerHTML = `✓ Payment link ready (connect Stripe API to activate):<br/><br/>Assignment Fee: $${fee.toLocaleString()}<br/>Property: ${address}<br/>Buyer: ${buyer}<br/><br/>→ Configure STRIPE_SECRET_KEY in your ORQ .env to activate live payments.`;
-    state.deals.push({ property: address, buyer, fee, status: 'pending', date: new Date().toLocaleDateString() });
-    saveState();
-    renderRevenue();
-  }
-}
-
-// ── UTILS ──
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-let toastTimeout;
-function showToast(msg) {
-  let toast = document.getElementById('toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'toast';
-    toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);border:1px solid var(--slate);border-radius:8px;padding:12px 22px;font-size:.85rem;color:var(--light);z-index:500;opacity:0;transition:opacity .3s;white-space:nowrap';
-    document.body.appendChild(toast);
-  }
-  toast.textContent = msg;
-  toast.style.opacity = '1';
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => toast.style.opacity = '0', 3000);
-}
-</script>
+<script src="app.js"></script>
 </body>
 </html>
